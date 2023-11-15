@@ -1,0 +1,11 @@
+.main {
+    text-align: center;
+}
+
+.main>h1 {
+    margin-bottom: 4rem;
+}
+
+.menu>* {
+    margin-bottom: 2rem;
+}

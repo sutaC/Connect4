@@ -1,0 +1,21 @@
+.customFooter {
+    position: fixed;
+    left: 0;
+    bottom: 1rem;
+
+    width: 100%;
+
+    text-align: center;
+}
+
+.customFooter>p {
+    margin-bottom: 2rem;
+}
+
+.author {
+    color: var(--accent);
+}
+
+.author>a {
+    color: var(--accent);
+}

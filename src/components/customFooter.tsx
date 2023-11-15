@@ -8,7 +8,7 @@ export default function CustomFooter({
 	return (
 		<footer className={styles.customFooter}>
 			<p>{children}</p>
-			<p className={styles.author}>
+			<small className={styles.author}>
 				Game by{" "}
 				<a
 					href='https://github.com/sutaC'
@@ -17,7 +17,7 @@ export default function CustomFooter({
 				>
 					sutaC
 				</a>
-			</p>
+			</small>
 		</footer>
 	);
 }
