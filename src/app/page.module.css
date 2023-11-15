@@ -35,6 +35,8 @@
     border: 1px solid var(--accent);
     border-radius: 1rem;
     box-shadow: 0 4px 4px #00000088;
+
+    text-align: left;
 }
 
 .modalForm>input,

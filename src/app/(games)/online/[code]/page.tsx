@@ -34,13 +34,15 @@ export default function Page() {
 			></GamePage>
 			<CustomModal open={modalOpen}>
 				<h2>Waiting for other player...</h2>
-				<small>Game code:</small>
-				<p className='highlight'>01234567</p>
+				<div>
+					<small>Game code:</small>
+					<p className='highlight'>01234567</p>
+				</div>
 				<div onClick={handleExit}>
 					<CustomButton>Exit</CustomButton>
 				</div>
 			</CustomModal>
-			<CustomFooter>Local multiplayer</CustomFooter>
+			<CustomFooter>Online multiplayer</CustomFooter>
 		</>
 	);
 }

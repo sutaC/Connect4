@@ -17,8 +17,8 @@ export default function GamePage({
 	handleExit?: () => void;
 	handleNewGame?: () => void;
 }) {
-	const [modalOpen, setModalOpen] = useState(false);
-	const [endMsg, setEndMsg] = useState("");
+	const [modalOpen, setModalOpen] = useState(true);
+	const [endMsg, setEndMsg] = useState("xxx");
 
 	type GameEndEvent = CustomEvent<{ msg: string }>;
 	function gameEnd(event: GameEndEvent) {
