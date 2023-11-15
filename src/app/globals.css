@@ -83,3 +83,8 @@ small {
   color: var(--accent);
   font-size: 1.25rem;
 }
+
+.highlight:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}

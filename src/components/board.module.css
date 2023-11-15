@@ -3,6 +3,9 @@
     grid-template-columns: repeat(7, 1fr);
     gap: 0.5rem;
 
+    width: clamp(10vw, 30rem, 90vw);
+    margin-bottom: 15%;
+
     padding: 1rem;
 
     border-radius: 1rem;
@@ -14,12 +17,11 @@
 .cell {
     display: grid;
     align-items: center;
-    justify-content: center;
 
-    width: 3rem;
+    width: 100%;
     aspect-ratio: 1;
 
-    border: 3px solid var(--accent);
+    border: 2px solid var(--accent);
     border-radius: 100%;
 
     background: var(--secondary);
@@ -29,11 +31,12 @@
 .cell.red::after {
     content: "";
     display: block;
+    margin: auto;
 
-    width: 1.5rem;
+    width: 50%;
     aspect-ratio: 1;
 
-    border: 3px solid #0004;
+    border: 2px solid #0004;
     border-radius: 100%;
 }
 
