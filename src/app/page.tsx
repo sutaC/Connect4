@@ -38,11 +38,16 @@ export default function Home() {
 				</div>
 			</main>
 			<CustomModal open={modalOpen}>
-				<button onClick={closeModal} className={styles.modalCloseBtn}>
-					x
-				</button>
+				<header className={styles.modalHeader}>
+					<button
+						onClick={closeModal}
+						className={styles.modalCloseBtn}
+					>
+						x
+					</button>
 
-				<h2>Play online games</h2>
+					<h2>Play online games</h2>
+				</header>
 
 				<form className={styles.modalForm}>
 					<p>Join game</p>

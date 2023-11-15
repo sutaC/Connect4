@@ -20,7 +20,12 @@ export default function CustomModal({
 	}, [open]);
 
 	return (
-		<dialog ref={element} className={styles.customModal}>
+		<dialog
+			ref={element}
+			className={`${styles.customModal} ${
+				open ? styles.open : styles.close
+			}`}
+		>
 			{children}
 		</dialog>
 	);

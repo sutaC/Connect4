@@ -1,0 +1,19 @@
+.customModal.open {
+    display: flex;
+    gap: 2rem;
+    flex-direction: column;
+
+    width: clamp(20%, 35rem, 95%);
+    padding: 1rem;
+
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 4px 4px #00000088;
+
+    background: var(--background);
+    color: var(--text);
+}
+
+.customModal::backdrop {
+    background: #000000CC;
+}

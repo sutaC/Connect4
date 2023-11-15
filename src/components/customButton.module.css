@@ -1,4 +1,6 @@
 .customButton {
+    width: 100%;
+
     padding: 0.5em 4em;
 
     border: none;
@@ -8,6 +10,7 @@
 
     font-size: 1rem;
     cursor: pointer;
+    user-select: none;
 }
 
 .customButton:hover,
