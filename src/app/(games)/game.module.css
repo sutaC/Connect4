@@ -1,0 +1,18 @@
+.exitButton {
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+
+    border: none;
+
+    font-size: 0.75rem;
+    text-decoration: underline;
+    color: var(--accent);
+    background: transparent;
+    cursor: pointer;
+}
+
+.main h1 {
+    margin-bottom: 4rem;
+    text-align: center;
+}

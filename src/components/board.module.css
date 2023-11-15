@@ -1,4 +1,46 @@
 .board {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+
+    padding: 1rem;
+
+    border-radius: 1rem;
+    box-shadow: 0 4px 4px #00000088;
+
+    background-color: var(--primary);
+}
+
+.cell {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+
+    width: 3rem;
+    aspect-ratio: 1;
+
+    border: 3px solid var(--accent);
+    border-radius: 100%;
+
+    background: var(--secondary);
+}
+
+.cell.yellow::after,
+.cell.red::after {
+    content: "";
+    display: block;
+
+    width: 1.5rem;
+    aspect-ratio: 1;
+
+    border: 3px solid #0004;
+    border-radius: 100%;
+}
+
+.cell.red {
+    background: red;
+}
+
+.cell.yellow {
+    background: yellow;
 }

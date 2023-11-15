@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import Board, { Player } from "@/components/board";
+import Board from "@/components/board";
 import styles from "./game.module.css";
 import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
+import { Player } from "@/modules/board";
 
 export default function GamePage({
 	board,

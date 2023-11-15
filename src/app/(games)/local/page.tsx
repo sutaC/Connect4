@@ -1,14 +1,11 @@
 "use client";
 import { useState } from "react";
-import { Player } from "@/components/board";
 import GamePage from "../game";
 import CustomFooter from "@/components/customFooter";
+import { getEmptyBoard } from "@/modules/board";
 
 export default function Page() {
-	const [board, setBoard] = useState(
-		new Array(6).fill(new Array<Player>(7).fill(""))
-	);
-
+	const [board, setBoard] = useState(getEmptyBoard());
 	function handleExit() {
 		if (
 			confirm(
@@ -20,7 +17,7 @@ export default function Page() {
 	}
 
 	function handleNewGame() {
-		setBoard(new Array(6).fill(new Array<Player>(7).fill("")));
+		setBoard(getEmptyBoard());
 	}
 
 	return (
