@@ -1,0 +1,49 @@
+.board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+
+    width: clamp(10vw, 30rem, 90vw);
+    margin-bottom: 15%;
+
+    padding: 1rem;
+
+    border-radius: 1rem;
+    box-shadow: 0 4px 4px #00000088;
+
+    background-color: var(--primary);
+}
+
+.cell {
+    display: grid;
+    align-items: center;
+
+    width: 100%;
+    aspect-ratio: 1;
+
+    border: 2px solid var(--accent);
+    border-radius: 100%;
+
+    background: var(--secondary);
+}
+
+.cell.yellow::after,
+.cell.red::after {
+    content: "";
+    display: block;
+    margin: auto;
+
+    width: 50%;
+    aspect-ratio: 1;
+
+    border: 2px solid #0004;
+    border-radius: 100%;
+}
+
+.cell.red {
+    background: red;
+}
+
+.cell.yellow {
+    background: yellow;
+}
