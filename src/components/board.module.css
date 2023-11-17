@@ -25,6 +25,7 @@
     border-radius: 100%;
 
     background: var(--secondary);
+    cursor: pointer;
 }
 
 .cell.yellow::after,

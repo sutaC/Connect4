@@ -1,8 +1,17 @@
+"use client"
 import styles from "./board.module.css";
 import type { Player } from "@/modules/board";
 
+export type BoardClickEvent = CustomEvent<{row: number}>
+
+function emitBoardClickEvent(row: number){
+	const event: BoardClickEvent = new CustomEvent("boardClick", {detail: {row}})
+	document.dispatchEvent(event);
+}
+
 function printBoard(board: Player[][]) {
 	const boardPrint = [];
+
 
 	for (let y = 0; y < board.length; y++) {
 		for (let x = 0; x < board[y].length; x++) {
@@ -17,6 +26,7 @@ function printBoard(board: Player[][]) {
 							: styles.yellow
 					}`}
 					key={y + "-" + x}
+					onClick={() => {emitBoardClickEvent(x)}}
 				></div>
 			);
 		}
@@ -26,9 +36,6 @@ function printBoard(board: Player[][]) {
 }
 
 export default function Board({ board }: { board: Player[][] }) {
-	board[0][0] = "yellow";
-	board[1][1] = "red";
-
 	const boardPrint = printBoard(board);
 
 	return <div className={styles.board}>{boardPrint}</div>;
