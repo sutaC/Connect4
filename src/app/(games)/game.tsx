@@ -6,30 +6,41 @@ import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
 import { Player } from "@/modules/board";
 
+export type GameOverEvent = CustomEvent<{ msg: string }>;
+
 export default function GamePage({
 	board,
 	turnMsg,
-	handleExit,
 	handleNewGame,
 }: {
 	board: Player[][];
 	turnMsg: string;
-	handleExit?: () => void;
 	handleNewGame?: () => void;
 }) {
 	const [modalOpen, setModalOpen] = useState(false);
-	const [endMsg, setEndMsg] = useState("xxx");
+	const [endMsg, setEndMsg] = useState("");
 
-	type GameEndEvent = CustomEvent<{ msg: string }>;
-	function gameEnd(event: GameEndEvent) {
+	function handleExit() {
+		if (
+			confirm(
+				"Are you sure you want to exit game? It will be lost forever!"
+			)
+		) {
+			location.href = "/";
+		}
+	}
+
+	function gameEnd(event: GameOverEvent) {
 		setEndMsg(event.detail.msg);
 		setModalOpen(true);
 	}
+	const gameOverEventListener  =(event: Event) => {
+		gameEnd(event as GameOverEvent);
+	}
 
 	useEffect(() => {
-		document.addEventListener("gameEnd", (event: any) => {
-			gameEnd(event);
-		});
+		document.removeEventListener("gameOver", gameOverEventListener);
+		document.addEventListener("gameOver", gameOverEventListener);
 	}, []);
 
 	return (

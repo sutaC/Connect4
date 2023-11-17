@@ -15,4 +15,6 @@
 .main h1 {
     margin-bottom: 3rem;
     text-align: center;
+    text-transform: capitalize;
+    user-select: none;
 }
