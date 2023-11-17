@@ -29,7 +29,6 @@ export default function Page() {
 			<GamePage
 				board={board}
 				turnMsg='Your turn!'
-				handleExit={handleExit}
 				handleNewGame={handleNewGame}
 			></GamePage>
 			<CustomModal open={modalOpen}>
