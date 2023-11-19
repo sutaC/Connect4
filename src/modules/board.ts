@@ -1,3 +1,5 @@
+import { GameOverEvent } from "@/app/(games)/game";
+
 export type Player = null | "red" | "yellow";
 
 export function getEmptyBoard(): Player[][] {
@@ -11,18 +13,18 @@ export function getEmptyBoard(): Player[][] {
 	return board;
 }
 
-export function playMove(board: Player[][], row: number, player: Player): boolean{
+export function playMove(board: Player[][], row: number, color: Player): Player[][] | null{
 	for(let i = 0; i < board.length; i++){	
 		if(board[i][row] !== null){	
 			if(i === 0){
-				return false
+				return null
 			}
-			board[i - 1][row] = player;
-			return true;
+			board[i - 1][row] = color;
+			return board;
 		}
 	}
-	board[board.length - 1][row] = player;
-	return true;
+	board[board.length - 1][row] = color;
+	return board;
 }
 
 function checkDiagonal(board: Player[][], y: number, x: number, move: (y: number, x: number) => {nY: number, nX: number}): boolean {
@@ -104,5 +106,23 @@ export function checkGameOver(board: Player[][]): boolean{
 		}
 	}
 	
+	return false;
+}
+
+export function checkGameState(board: Player[][], playerMsg: string, document: Document): boolean{
+	const gameOver = checkGameOver(board);
+	if(gameOver){
+		const gameOverEvent: GameOverEvent = new CustomEvent("gameOver", {detail: {msg: `${playerMsg} won!`}});
+		document.dispatchEvent(gameOverEvent);
+		return true;
+	}
+
+	const draw = checkDraw(board);
+	if(draw){
+		const gameOverEvent: GameOverEvent = new CustomEvent("gameOver", {detail: {msg: "Draw!"}});
+		document.dispatchEvent(gameOverEvent);
+		return true
+	}
+
 	return false;
 }
