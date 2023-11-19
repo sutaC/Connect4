@@ -55,7 +55,7 @@ export default function GamePage({
 
 			<CustomModal open={modalOpen}>
 				<h2>Game finished</h2>
-				<p>{endMsg}</p>
+				<p className={styles.endMsg}>{endMsg}</p>
 				<div
 					onClick={() => {
 						if (handleNewGame) {

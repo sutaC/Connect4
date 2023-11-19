@@ -27,7 +27,7 @@ export default function Page() {
 
 		const gameOver = checkGameOver(board);
 		if(gameOver){
-			const msg = `${turn?.toUpperCase()} won!`
+			const msg = `${turn} won!`
 			const gameOverEvent: GameOverEvent = new CustomEvent("gameOver", {detail: {msg}});
 			document.dispatchEvent(gameOverEvent);
 			return
