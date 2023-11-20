@@ -179,5 +179,5 @@ function minimax(board: Player[][], color: Player, depth: number){
 }
 
 export default function playAIMove(board: Player[][], color: Player): Player[][] {
-    return minimax(board, color, 5);
+    return minimax(board, color, 4);
 }
