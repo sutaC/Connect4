@@ -1,4 +1,4 @@
-import { Player, checkDraw, checkGameOver, playMove } from "./board";
+import { Player, checkDraw, getEmptyBoard, playMove } from "./board";
 
 function splitArray<T>(array: T[], devider: T): T[][]{
     const result: T[][] = [];
@@ -44,16 +44,16 @@ function evalLine(board: Player[][], y: number, x: number, move: (y: number, x: 
     threadsR.forEach(thread => {
         if(thread.length >= 4){
             const filled = thread.filter(v => v !== null).length;
-            if(filled >= 4) return 1000
-            eva += filled * 2 + thread.length - filled
+            if(filled >= 4) return 1000;
+            eva += filled * filled + thread.length - filled
         }
     })
     
     threadsY.forEach(thread => {
         if(thread.length >= 4){
             const filled = thread.filter(v => v !== null).length;
-            if(filled >= 4) return -1000
-            eva -= filled * 2 + thread.length - filled
+            if(filled >= 4) return -1000;
+            eva -= filled * filled + thread.length - filled
         }
     })
 
@@ -65,80 +65,119 @@ function evaluateGame(board: Player[][]): number{
     
     let eva = 0;
 
-    {
-		// Horizontal
-		for(let y = 0; y < board.length; y++){
-            eva += evalLine(board, y, 0, (y, x) => {return {nY: y, nX: x+1}})
-		}
-	}
+    // Horizontal
+    for(let y = 0; y < board.length; y++){
+        eva += evalLine(board, y, 0, (y, x) => {return {nY: y, nX: x+1}})
+    }
 	
-	{
-        // Vertical
-		for(let x = 0; x < board[0].length; x++){
-            eva += evalLine(board, 0, x, (y, x) => {return {nY: y+1, nX: x}})
-		}
-	}
+    // Vertical
+    for(let x = 0; x < board[0].length; x++){
+        eva += evalLine(board, 0, x, (y, x) => {return {nY: y+1, nX: x}})
+    }
+    
+    // Diagonals
+    for(let x = 0; x < board[0].length; x++){
+        // DownRight
+        eva += evalLine(board, 0, x, (y, x) => {return {nY: y+1, nX: x+1}})
+        // DownLeft
+        eva += evalLine(board, 0, x, (y, x) => {return {nY: y+1, nX: x-1}})
+    }
 
-    {
-		// Diagonals
-		for(let x = 0; x < board[0].length; x++){
-			// DownRight
-			eva += evalLine(board, 0, x, (y, x) => {return {nY: y+1, nX: x+1}})
-
-			// DownLeft
-			eva += evalLine(board, 0, x, (y, x) => {return {nY: y+1, nX: x-1}})
-		}
-
-		for(let x = 0; x < board[0].length; x++){
-			// UpRight
-			eva += evalLine(board, board.length - 1, x, (y, x) => {return {nY: y-1, nX: x+1}})
-
-			// UpLeft
-			eva += evalLine(board, board.length - 1, x, (y, x) => {return {nY: y-1, nX: x-1}})
-		}
-	}
-
+    for(let x = 0; x < board[0].length; x++){
+        // UpRight
+        eva += evalLine(board, board.length - 1, x, (y, x) => {return {nY: y-1, nX: x+1}})
+        // UpLeft
+        eva += evalLine(board, board.length - 1, x, (y, x) => {return {nY: y-1, nX: x-1}})
+    }
+	
     return eva;
 }
 
-function findBestMove(board: Player[][], color: Player): number | null {
-    const options: {row: number, eva: number}[] = []
+function getAllPossibleMoves(board: Player[][], color: Player): Player[][][]{
+    const moves: Player[][][] = []
 
     for(let i = 0; i < board[0].length; i++){
         const newBoard = structuredClone(board);
         const move = playMove(newBoard, i, color);
         if(!move) continue; 
-        const eva = evaluateGame(move);
-        options.push({row: i, eva})
+        moves.push(move)
     }
 
-    console.log(options);
+    return moves;
+}
 
-    if(options.length === 0) return null;
+type EvalMove = {
+    eva: number,
+    move: Player[][]
+}
 
-    let bestIdx = options[0].row;
+function mimx(board: Player[][], color: Player, depth: number): EvalMove {
+    if(depth <= 0) {
+        const moves = getAllPossibleMoves(board, color);
+
+        if(color === "red"){
+            let maxEval = -Infinity;
+            let bestMove = getEmptyBoard();
+
+            for(let i = 0; i < moves.length; i++){
+                const eva = evaluateGame(moves[i]);
+                if(maxEval < eva){
+                    maxEval = eva;
+                    bestMove = moves[i]
+                }
+            }
+            return {eva: maxEval, move: bestMove};
+        } else {
+            let minEval = Infinity;
+            let bestMove = getEmptyBoard()
+
+            for(let i = 0; i < moves.length; i++){
+                const eva = evaluateGame(moves[i]);
+                if(minEval > eva){
+                    minEval = eva;
+                    bestMove = moves[i]
+                }
+            }
+            return {eva: minEval, move: bestMove};
+        }
+    }
+
+    // Recusion
+
+    const moves = getAllPossibleMoves(board, color);
+    const opp = color === "red" ? "yellow" : "red";
 
     if(color === "red"){
-        for(let i = 1; i < options.length; i++){
-            if(options[bestIdx].eva < options[i].eva) bestIdx = i;
-        }
-    } else if(color === "yellow")  {
-        for(let i = 1; i < options.length; i++){
-            if(options[bestIdx].eva > options[i].eva) bestIdx = i;
-        }
-    } else return null;
+        let maxEval = -Infinity;
+        let bestMove = getEmptyBoard();
 
-    console.log(options[bestIdx].eva);
-    
-    return options[bestIdx].row;
+        for(let i = 0; i < moves.length; i++){
+            const eva = mimx(moves[i], opp, depth-1).eva;
+            if(maxEval < eva){
+                maxEval = eva;
+                bestMove = moves[i]
+            }
+        }
+        return {eva: maxEval, move: bestMove};
+    } else {
+        let minEval = Infinity;
+        let bestMove = getEmptyBoard()
+
+        for(let i = 0; i < moves.length; i++){
+            const eva = mimx(moves[i], opp, depth-1).eva;
+            if(minEval > eva){
+                minEval = eva;
+                bestMove = moves[i]
+            }
+        }
+        return {eva: minEval, move: bestMove};
+    }
+}
+
+function minimax(board: Player[][], color: Player, depth: number){
+    return mimx(board, color, depth).move 
 }
 
 export default function playAIMove(board: Player[][], color: Player): Player[][] {
-    const bestMoveRow = findBestMove(board, color);
-    
-    if(!bestMoveRow) throw new Error("Cannot find any move");
-    
-    playMove(board, bestMoveRow, color)
-
-    return board;
+    return minimax(board, color, 5);
 }
