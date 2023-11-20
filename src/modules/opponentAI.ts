@@ -1,37 +1,63 @@
 import { Player, checkDraw, checkGameOver, playMove } from "./board";
 
+function splitArray<T>(array: T[], devider: T): T[][]{
+    const result: T[][] = [];
+    let segment: T[] = []
+    for(let i = 0; i < array.length; i++){
+        const val = array[i];
+        if(val === devider){
+            if(segment.length === 0) continue;
+            result.push(segment);
+            segment = []
+            continue;
+        }
+       segment.push(val); 
+    }
+    return result;
+}
+
 function evalLine(board: Player[][], y: number, x: number, move: (y: number, x: number) => {nY: number, nX: number}): number {
     if(y < 0 || x < 0 || x >= board[0].length || y >= board.length) {
         throw new Error("Y or X out of scope") 
     }
     
-    let count = 0;
-    let eva = 0;
+    const line: Player[] = [];
 
 	while(true){
+        line.push(board[y][x]);
 		const {nY, nX} = move(y, x);
 
 		if(nY < 0 || nX < 0 || nX >= board[0].length || nY >= board.length) {
-            const factor = board[y][x] === "red" ? 1 : -1;
-            eva += count * factor; 
-            return eva;
+            break;
         }
-		
-        const val = board[y][x]
-
-        if(val === board[nY][nX] && board[y][x] !== null){
-            count++;
-        } else {
-            const factor = val === "red" ? 1 : -1;
-            eva += count * factor; 
-            count = 0
-        }
-
-		if(count >= 3) return 1000
-
 		y = nY;
 		x = nX;
 	}
+
+    if(!line.find((v) => v !== null)) return 0;
+
+    const threadsR = splitArray(line, "yellow") as Player[][];
+    const threadsY = splitArray(line, "red") as Player[][];
+
+    let eva = 0;
+
+    threadsR.forEach(thread => {
+        if(thread.length >= 4){
+            const filled = thread.filter(v => v !== null).length;
+            if(filled >= 4) return 1000
+            eva += filled * 2 + thread.length - filled
+        }
+    })
+    
+    threadsY.forEach(thread => {
+        if(thread.length >= 4){
+            const filled = thread.filter(v => v !== null).length;
+            if(filled >= 4) return -1000
+            eva -= filled * 2 + thread.length - filled
+        }
+    })
+
+    return eva;
 }
 
 function evaluateGame(board: Player[][]): number{
