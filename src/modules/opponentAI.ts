@@ -101,14 +101,44 @@ function evaluateGame(board: Player[][]): number{
     return eva;
 }
 
+function findBestMove(board: Player[][], color: Player): number | null {
+    const options: {row: number, eva: number}[] = []
+
+    for(let i = 0; i < board[0].length; i++){
+        const newBoard = structuredClone(board);
+        const move = playMove(newBoard, i, color);
+        if(!move) continue; 
+        const eva = evaluateGame(move);
+        options.push({row: i, eva})
+    }
+
+    console.log(options);
+
+    if(options.length === 0) return null;
+
+    let bestIdx = options[0].row;
+
+    if(color === "red"){
+        for(let i = 1; i < options.length; i++){
+            if(options[bestIdx].eva < options[i].eva) bestIdx = i;
+        }
+    } else if(color === "yellow")  {
+        for(let i = 1; i < options.length; i++){
+            if(options[bestIdx].eva > options[i].eva) bestIdx = i;
+        }
+    } else return null;
+
+    console.log(options[bestIdx].eva);
+    
+    return options[bestIdx].row;
+}
 
 export default function playAIMove(board: Player[][], color: Player): Player[][] {
-    let row: number;
-    do {
-        row = Math.floor(Math.random() * 6)
-    } while(!playMove(board, row, color));
-
-    console.log(evaluateGame(board));
+    const bestMoveRow = findBestMove(board, color);
+    
+    if(!bestMoveRow) throw new Error("Cannot find any move");
+    
+    playMove(board, bestMoveRow, color)
 
     return board;
 }
