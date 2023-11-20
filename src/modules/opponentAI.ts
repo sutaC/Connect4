@@ -50,7 +50,7 @@ function evalLine(
         if (thread.length >= 4) {
             const filled = thread.filter((v) => v !== null).length;
             if (filled >= 4) return 1000;
-            eva += filled * filled + thread.length - filled;
+            eva += filled * filled;
         }
     });
 
@@ -58,7 +58,7 @@ function evalLine(
         if (thread.length >= 4) {
             const filled = thread.filter((v) => v !== null).length;
             if (filled >= 4) return -1000;
-            eva -= filled * filled + thread.length - filled;
+            eva -= filled * filled;
         }
     });
 
