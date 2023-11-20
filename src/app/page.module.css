@@ -2,11 +2,11 @@
     text-align: center;
 }
 
-.main>h1 {
+.main > h1 {
     margin-bottom: 4rem;
 }
 
-.menu>* {
+.menu > * {
     margin-bottom: 2rem;
 }
 
@@ -16,7 +16,7 @@
     gap: 0.5rem;
 }
 
-.modalCloseBtn {
+.modalBtn {
     align-self: end;
     width: fit-content;
 
@@ -39,12 +39,12 @@
     text-align: left;
 }
 
-.modalForm>input,
-.modalForm>.customCheckbox {
+.modalForm > input,
+.modalForm > .customCheckbox {
     margin: 1rem 0;
 }
 
-.modalForm>input {
+.modalForm > input {
     width: 100%;
     padding: 1rem;
 
@@ -56,11 +56,11 @@
     color: var(--accent);
 }
 
-.customCheckbox>input {
+.customCheckbox > input {
     visibility: hidden;
 }
 
-.customCheckbox>input::after {
+.customCheckbox > input::after {
     visibility: visible;
     content: " ";
     display: block;
@@ -75,12 +75,12 @@
     background-color: var(--primary);
 }
 
-.customCheckbox>input:hover:after,
-.customCheckbox>input:focus:after {
+.customCheckbox > input:hover:after,
+.customCheckbox > input:focus:after {
     opacity: 0.8;
 }
 
-.customCheckbox>input:checked:after {
+.customCheckbox > input:checked:after {
     content: "X";
     text-align: center;
     font-weight: bold;
@@ -89,7 +89,7 @@
     color: var(--secondary);
 }
 
-.customCheckbox>label {
+.customCheckbox > label {
     margin-left: 0.5rem;
     cursor: pointer;
     user-select: none;
