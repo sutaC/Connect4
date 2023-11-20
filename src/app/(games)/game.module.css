@@ -18,3 +18,31 @@
     text-transform: capitalize;
     user-select: none;
 }
+
+.endMsg {
+    text-transform: capitalize;
+}
+
+.modalHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.modalBtn {
+    align-self: end;
+    width: fit-content;
+
+    border: none;
+
+    cursor: pointer;
+    background: transparent;
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.opacity dialog,
+.opacity dialog::backdrop {
+    opacity: 0.5;
+}
