@@ -4,23 +4,39 @@ import GamePage from "../../game";
 import CustomFooter from "@/components/customFooter";
 import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
-import { getEmptyBoard } from "@/modules/board";
+import { Player, getEmptyBoard } from "@/modules/board";
+import { handleWsInit, wsSendUserConnect } from "@/modules/wsControll";
 
 export default function Page() {
-    const [gameCode, setGameCode] = useState(0);
+    let board: Player[][] = getEmptyBoard();
+    let turn: Player = null;
+    let player: Player = null;
+
+    const [boardView, setBoardView] = useState(board);
+    const [turnMsg, setTurnMsg] = useState<string>(turn ?? "");
+    const [modalOpen, setModalOpen] = useState(true);
+
+    let gameCode = 0;
+    const [gameCodeView, setGameCodeView] = useState(gameCode);
     const socketRef: MutableRefObject<WebSocket | undefined> = useRef();
 
-    useEffect(() => {
+    // --- Game init ---
+    function getGameCode() {
         try {
-            setGameCode(
-                Number(
-                    location.pathname.substring(location.pathname.length - 8)
-                )
+            gameCode = Number(
+                location.pathname.substring(location.pathname.length - 8)
             );
+            setGameCodeView(gameCode);
         } catch (error) {
             console.error(error);
         }
-    }, []);
+    }
+    useEffect(getGameCode, []);
+
+    function connectionSucced() {
+        console.log("Connected with opponent");
+        setModalOpen(false);
+    }
 
     function handleWebsocket() {
         if (socketRef.current) return;
@@ -28,19 +44,32 @@ export default function Page() {
         socketRef.current = new WebSocket("ws://localhost:3040");
 
         socketRef.current.addEventListener("open", () => {
-            console.log("We are connected!");
-        });
+            if (!socketRef.current) return;
 
-        socketRef.current.addEventListener("message", (event: MessageEvent) => {
-            console.log(event);
+            console.log("WS Connected");
+
+            wsSendUserConnect(socketRef.current, {
+                gameCode,
+                userId: 1234,
+            });
+
+            const initLister = (event: MessageEvent) => {
+                if (socketRef.current)
+                    handleWsInit(
+                        event,
+                        socketRef.current,
+                        initLister,
+                        handleBoardUpdate,
+                        connectionSucced
+                    );
+            };
+
+            socketRef.current.addEventListener("message", initLister);
         });
     }
     useEffect(handleWebsocket, []);
 
-    // App
-    const [modalOpen, setModalOpen] = useState(true);
-    const [board, setBoard] = useState(getEmptyBoard());
-
+    // --- App ---
     function handleExit() {
         if (
             confirm(
@@ -52,21 +81,30 @@ export default function Page() {
     }
 
     function handleNewGame() {
-        setBoard(getEmptyBoard());
+        board = getEmptyBoard();
+        setBoardView(board);
     }
 
+    function handleBoardUpdate(newBoard: Player[][], newTurn: Player) {
+        board = newBoard;
+        setBoardView(board);
+        turn = newTurn;
+        setTurnMsg(player === turn ? "your" : "opponents");
+    }
+
+    // --- Render ---
     return (
         <>
             <GamePage
-                board={board}
-                turnMsg="Your turn!"
+                board={boardView}
+                turnMsg={turnMsg}
                 handleNewGame={handleNewGame}
             ></GamePage>
             <CustomModal open={modalOpen}>
                 <h2>Waiting for other player...</h2>
                 <div>
                     <small>Game code:</small>
-                    <p className="highlight">{gameCode ?? ""}</p>
+                    <p className="highlight">{gameCodeView ?? ""}</p>
                 </div>
                 <div onClick={handleExit}>
                     <CustomButton>Exit</CustomButton>

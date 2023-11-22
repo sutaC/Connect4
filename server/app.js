@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import router from "./modules/router.js";
 import { WebSocketServer } from "ws";
+import wsRouter from "./modules/wsRouter.js";
 
 const port = process.env.PORT ?? 3001;
 const wsport = process.env.WSPORT ?? 3002;
@@ -20,15 +21,9 @@ app.use(router);
 
 const wss = new WebSocketServer({ port: wsport });
 
-wss.on("connection", (socket) => {
-    console.log("New user connected");
+wsRouter(wss);
 
-    socket.send("hello");
-
-    socket.on("close", () => {
-        console.log("User disconnected");
-    });
-});
+wss.on("connection", (socket) => {});
 
 // Listen
 
