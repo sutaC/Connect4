@@ -1,26 +1,41 @@
 "use client";
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import GamePage from "../../game";
 import CustomFooter from "@/components/customFooter";
 import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
 import { getEmptyBoard } from "@/modules/board";
 
-let evtSource: EventSource;
-
-function handleMsgHello(event: MessageEvent) {
-    evtSource.close();
-
-    const data = JSON.parse(event.data);
-    console.log(data);
-}
-
 export default function Page() {
-    useEffect(() => {
-        evtSource = new EventSource("http://localhost:3030/api/online");
+    const [gameCode, setGameCode] = useState(0);
+    const socketRef: MutableRefObject<WebSocket | undefined> = useRef();
 
-        evtSource.addEventListener("hello", handleMsgHello);
+    useEffect(() => {
+        try {
+            setGameCode(
+                Number(
+                    location.pathname.substring(location.pathname.length - 8)
+                )
+            );
+        } catch (error) {
+            console.error(error);
+        }
     }, []);
+
+    function handleWebsocket() {
+        if (socketRef.current) return;
+
+        socketRef.current = new WebSocket("ws://localhost:3040");
+
+        socketRef.current.addEventListener("open", () => {
+            console.log("We are connected!");
+        });
+
+        socketRef.current.addEventListener("message", (event: MessageEvent) => {
+            console.log(event);
+        });
+    }
+    useEffect(handleWebsocket, []);
 
     // App
     const [modalOpen, setModalOpen] = useState(true);
@@ -51,7 +66,7 @@ export default function Page() {
                 <h2>Waiting for other player...</h2>
                 <div>
                     <small>Game code:</small>
-                    <p className="highlight">0123456789</p>
+                    <p className="highlight">{gameCode ?? ""}</p>
                 </div>
                 <div onClick={handleExit}>
                     <CustomButton>Exit</CustomButton>

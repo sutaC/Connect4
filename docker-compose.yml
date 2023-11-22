@@ -14,8 +14,10 @@ services:
         build: /server
         environment:
             - PORT=3030
+            - WSPORT=3040
         ports:
             - 3030:3030
+            - 3040:3040
         volumes:
             - ./server:/app
             - /app/node_modules
