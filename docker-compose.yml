@@ -12,12 +12,31 @@ services:
             - /app/.next
     server:
         build: /server
+        depends_on:
+            - database
         environment:
             - PORT=3030
             - WSPORT=3040
+            - MONGODB_PASSWORD="pass"
+            - MONGODB_USER=conn4
+            - MONGODB_DATABASE=Connect4
+            - MONGODB_URL=mongodb://conn4:pass@database:27017/Connect4?authMechanism=DEFAULT&authSource=admin
         ports:
             - 3030:3030
             - 3040:3040
         volumes:
             - ./server:/app
             - /app/node_modules
+    database:
+        image: mongo:latest
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=admin
+            - MONGO_INITDB_ROOT_PASSWORD=root
+            - MONGO_INITDB_DATABASE=Connect4
+        volumes:
+            - ./database/data:/data/db
+              - ./database/init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js
+        ports:
+            - 27017:27017
+        expose:
+            - 27017
