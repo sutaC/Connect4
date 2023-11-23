@@ -61,10 +61,40 @@ export async function findGame(gameCode) {
                 gameCode,
                 $or: [{ userRed: null }, { userYellow: null }],
             });
-        return game.gameCode;
+        return game;
     } catch (error) {
         console.error(error);
     } finally {
         await client.close();
+    }
+}
+
+export async function updateGame(gameCode, userRed, userYellow) {
+    await client.connect();
+    try {
+        if (userRed) {
+            await client.db().collection("games").updateOne(
+                { gameCode },
+                {
+                    $set: {
+                        userRed,
+                    },
+                }
+            );
+        }
+        if (userYellow) {
+            await client.db().collection("games").updateOne(
+                { gameCode },
+                {
+                    $set: {
+                        userYellow,
+                    },
+                }
+            );
+        }
+    } catch (error) {
+        console.error(error);
+    } finally {
+        client.close();
     }
 }

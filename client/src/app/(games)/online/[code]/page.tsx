@@ -23,9 +23,8 @@ export default function Page() {
     // --- Game init ---
     function getGameCode() {
         try {
-            gameCode = Number(
-                location.pathname.substring(location.pathname.length - 8)
-            );
+            const devider = location.pathname.lastIndexOf("/");
+            gameCode = Number(location.pathname.substring(devider + 1));
             setGameCodeView(gameCode);
         } catch (error) {
             console.error(error);
@@ -87,6 +86,7 @@ export default function Page() {
         setBoardView(board);
         turn = newTurn;
         setTurnMsg((player === turn ? "your" : "enemy's") + " turn!");
+        console.log("Update: " + turn);
     }
 
     // --- Render ---

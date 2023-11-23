@@ -55,8 +55,9 @@ export function handleWsInit(
     succesCb?: (color: Player) => void
 ) {
     const wsEvent = getWsEvent(event) as WsEventInit;
-    if (wsEvent.event !== "userAuth")
-        return console.warn("User was not authenticated");
+    if (wsEvent.event !== "userAuth") {
+        return;
+    }
 
     switch (wsEvent.payload.status) {
         case "error":
