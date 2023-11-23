@@ -4,9 +4,7 @@ import CustomButton from "@/components/customButton";
 import CustomModal from "@/components/customModal";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { ChangeEvent, FormEvent, useState } from "react";
-import { redirect } from "next/navigation";
-import { tree } from "next/dist/build/templates/app-page";
+import { FormEvent, useState } from "react";
 
 export default function Home() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -17,8 +15,6 @@ export default function Home() {
         event.preventDefault();
 
         if (!gameCode) return console.error("Code is required");
-        if (gameCode.length !== 8)
-            return console.error("Code length must equals 8");
 
         let data: undefined | number;
         try {
@@ -30,7 +26,7 @@ export default function Home() {
 
         const res = await fetch(`http://localhost:3030/api/game/join/${data}`);
 
-        if (res.ok) {
+        if (res.status === 200) {
             location.href = `/online/${data}`;
         } else {
             console.error("Couldn't find game : " + data);
@@ -80,7 +76,8 @@ export default function Home() {
             return console.error(error);
         }
 
-        if (!data) return console.error("Coudn't find game");
+        if (!data) return console.error("Coudn't get server data");
+        if (!data.code) return console.error("Coudn't find game");
 
         location.href = `/online/${data.code}`;
     }
@@ -132,8 +129,6 @@ export default function Home() {
                         name="gameCode"
                         placeholder="Game code..."
                         required
-                        minLength={8}
-                        maxLength={8}
                         value={gameCode}
                         onChange={(event) => {
                             setGameCode(event.target.value);

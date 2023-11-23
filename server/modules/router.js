@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { createGame, findGame, findPublicGame } from "./db.js";
 
 const router = new Router();
 
@@ -6,7 +7,7 @@ router.get("/api/game/join", (req, res) => {
     return res.sendStatus(400);
 });
 
-router.get("/api/game/join/:code", (req, res) => {
+router.get("/api/game/join/:code", async (req, res) => {
     let code;
 
     try {
@@ -16,26 +17,31 @@ router.get("/api/game/join/:code", (req, res) => {
     }
     if (!code) return res.status(400).send();
 
-    // TODO: Check if code exist
+    const gameCode = await findGame(code);
+
+    if (!gameCode) return res.status(404).send();
 
     return res.status(200).send();
 });
 
-router.post("/api/game/host", (req, res) => {
+router.post("/api/game/host", async (req, res) => {
     const data = req.body;
     const { gamePublic } = data;
 
-    if (gamePublic === undefined) return res.status(400).send();
+    if (typeof gamePublic !== "boolean") return res.status(400).send();
 
-    // TODO: Create game
-    const body = { code: 12345678 };
+    const gameCode = Date.now();
+    await createGame(gameCode, gamePublic);
+
+    const body = { code: gameCode };
 
     return res.send(JSON.stringify(body));
 });
 
-router.get("/api/game/find", (req, res) => {
-    // TODO: Find game
-    const body = { code: 12345678 };
+router.get("/api/game/find", async (req, res) => {
+    const code = await findPublicGame();
+
+    const body = { code };
 
     return res.send(JSON.stringify(body));
 });

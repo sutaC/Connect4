@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import router from "./modules/router.js";
 import { WebSocketServer } from "ws";
 import wsRouter from "./modules/wsRouter.js";
-import { connect } from "./modules/db.js";
 
 const port = process.env.PORT ?? 3001;
 const wsport = process.env.WSPORT ?? 3002;
@@ -23,8 +22,6 @@ app.use(router);
 const wss = new WebSocketServer({ port: wsport });
 
 wsRouter(wss);
-
-await connect();
 
 // Listen
 
