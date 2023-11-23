@@ -16,6 +16,7 @@ interface WsEventInit extends WsEvent {
     payload: {
         status: "ready" | "waiting" | "error";
         msg?: string;
+        color?: string;
     };
 }
 
@@ -27,21 +28,20 @@ function getWsEvent(event: MessageEvent): WsEvent {
 
 export function wsSendUserConnect(
     socket: WebSocket,
-    data: { gameCode: number; userId: number }
+    data: { gameCode: number }
 ) {
-    const helloEvent: WsEvent = {
+    const userConnectEvent: WsEvent = {
         event: "userConnect",
         payload: data,
     };
 
-    socket.send(JSON.stringify(helloEvent));
+    socket.send(JSON.stringify(userConnectEvent));
 }
 
 function handleWsBoardUpdate(
     event: MessageEvent,
     handleBoardUpdate: (board: Player[][], turn: Player) => void
 ) {
-    console.log("Recived board update");
     const wsEvent = getWsEvent(event) as WsEventBoardUpdate;
     const { board, turn } = wsEvent.payload;
     handleBoardUpdate(board, turn);
@@ -52,7 +52,7 @@ export function handleWsInit(
     socket: WebSocket,
     listener: (event: MessageEvent) => void,
     handleBoardUpdate: (board: Player[][], turn: Player) => void,
-    succesCb?: () => void
+    succesCb?: (color: Player) => void
 ) {
     const wsEvent = getWsEvent(event) as WsEventInit;
     if (wsEvent.event !== "userAuth")
@@ -63,14 +63,13 @@ export function handleWsInit(
             console.error("Couldn't initialize user", wsEvent.payload.msg);
             return;
         case "waiting":
-            console.log("Waiting for other player", wsEvent.payload.msg);
+            console.warn("Waiting for other player", wsEvent.payload.msg);
             return;
         case "ready":
-            console.log("User authenticated");
             socket.removeEventListener("message", listener);
             socket.addEventListener("message", (event) => {
                 handleWsBoardUpdate(event, handleBoardUpdate);
             });
-            if (succesCb) succesCb();
+            if (succesCb) succesCb((wsEvent.payload.color ?? null) as Player);
     }
 }

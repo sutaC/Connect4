@@ -33,8 +33,8 @@ export default function Page() {
     }
     useEffect(getGameCode, []);
 
-    function connectionSucced() {
-        console.log("Connected with opponent");
+    function connectionSucced(color: Player) {
+        player = color;
         setModalOpen(false);
     }
 
@@ -46,11 +46,8 @@ export default function Page() {
         socketRef.current.addEventListener("open", () => {
             if (!socketRef.current) return;
 
-            console.log("WS Connected");
-
             wsSendUserConnect(socketRef.current, {
                 gameCode,
-                userId: 1234,
             });
 
             const initLister = (event: MessageEvent) => {
@@ -89,7 +86,7 @@ export default function Page() {
         board = newBoard;
         setBoardView(board);
         turn = newTurn;
-        setTurnMsg(player === turn ? "your" : "opponents");
+        setTurnMsg((player === turn ? "your" : "enemy's") + " turn!");
     }
 
     // --- Render ---

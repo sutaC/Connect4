@@ -23,8 +23,6 @@ const wss = new WebSocketServer({ port: wsport });
 
 wsRouter(wss);
 
-wss.on("connection", (socket) => {});
-
 // Listen
 
 app.listen(port, () => {
