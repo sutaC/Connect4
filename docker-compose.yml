@@ -17,10 +17,10 @@ services:
         environment:
             - PORT=3030
             - WSPORT=3040
-            - MONGODB_USER=admin
-            - MONGODB_PASSWORD="root"
+            - MONGODB_USER=root
+            - MONGODB_PASSWORD=root
             - MONGODB_DATABASE=Connect4
-            - MONGODB_URL=mongodb://admin:root@database:27017/Connect4?authMechanism=DEFAULT&authSource=admin
+            - MONGODB_URL=mongodb://root:root@database:27017/Connect4?authSource=admin
         ports:
             - 3030:3030
             - 3040:3040
@@ -30,7 +30,7 @@ services:
     database:
         image: mongo:latest
         environment:
-            - MONGO_INITDB_ROOT_USERNAME=admin
+            - MONGO_INITDB_ROOT_USERNAME=root
             - MONGO_INITDB_ROOT_PASSWORD=root
             - MONGO_INITDB_DATABASE=Connect4
         volumes:
