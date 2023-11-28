@@ -12,9 +12,9 @@ interface WsEventBoardUpdate extends WsEvent {
     };
 }
 
-interface WsEventInit extends WsEvent {
+interface WsEventAuthentication extends WsEvent {
     payload: {
-        status: "ready" | "waiting" | "error";
+        status: "ok" | "error";
         msg?: string;
         color?: string;
     };
@@ -23,98 +23,78 @@ interface WsEventInit extends WsEvent {
 export default class WsControll {
 
     private socket: WebSocket;
+    private gameCode: number;
+    private authenticated: boolean = false;
 
-    public onBoardUpdate?: (board: Player[][], turn: Player) => void;
+    public onWsAutentication?: (color: Player) => any;
+    public onBoardUpdate?: (board: Player[][], turn: Player) => any;
 
     constructor(socket: WebSocket, gameCode: number){
-        this.socket = socket;
+        this.socket = socket;        
+        this.gameCode = gameCode;
 
-        this.sendMessage(this.socket, "userConnect", {gameCode})
-
-        socket.addEventListener("open", handleWsInit)
-
+        this.socket.addEventListener("open", this.handleWsOpen.bind(this))
     }
 
-    public getWsEvent(event: MessageEvent): WsEvent {
+    // --- Methods ---
+
+    private getWsEvent(event: MessageEvent): WsEvent {
         return JSON.parse(event.data);
     }
     
-    // ---
     
-    public sendMessage(
-        socket: WebSocket,
+    private sendMessage(
         event: string,
         data: {}
     ) {
-        const userConnectEvent: WsEvent = {
+        const wsEvent: WsEvent = {
             event,
             payload: data,
         };
-        socket.send(JSON.stringify(userConnectEvent));
+        
+        this.socket.send(JSON.stringify(wsEvent));
     }
 
-    // ---
+    // --- Events ---
 
-    private handleWsOpen(
-        event: MessageEvent,
-        socket: WebSocket,
-    ) {
-        const wsEvent = getWsEvent(event) as WsEventInit;
+    private handleWsOpen() {
+        const data = {
+            gameCode: this.gameCode
+        }
+
+        this.sendMessage("userConnect", data);
+        
+        this.socket.addEventListener("message", this.handleUserInit.bind(this))
+    }
+
+    private handleUserInit(event: MessageEvent){
+        const wsEvent = this.getWsEvent(event) as WsEventAuthentication;
+
         if (wsEvent.event !== "userAuth") {
+            if(!this.authenticated){
+                return console.warn("User was not authenticated and recived: ", wsEvent);
+            }
             return;
         }
-    
-        switch (wsEvent.payload.status) {
-            case "error":
-                console.error("Couldn't initialize user", wsEvent.payload.msg);
-                return;
-            case "waiting":
-                console.warn("Waiting for other player", wsEvent.payload.msg);
-                return;
-            case "ready":
-                socket.removeEventListener("message", listener);
-                socket.addEventListener("message", (event) => {
-                    handleWsBoardUpdate(event, handleBoardUpdate);
-                });
-                if (succesCb) succesCb((wsEvent.payload.color ?? null) as Player);
-        }
-    }
-    
 
+        if(wsEvent.payload.status === "ok"){
+            this.authenticated = true;
+            this.socket.removeEventListener("message", this.handleUserInit.bind(this));
 
-}
+            this.socket.addEventListener("message", this.handleBoardUpdate.bind(this));
 
-
-function handleWsBoardUpdate(
-    event: MessageEvent,
-    handleBoardUpdate: (board: Player[][], turn: Player) => void
-) {
-    const wsEvent = getWsEvent(event) as WsEventBoardUpdate;
-    const { board, turn } = wsEvent.payload;
-    handleBoardUpdate(board, turn);
-}
-
-export function handleWsInit(
-    event: MessageEvent,
-    socket: WebSocket,
-) {
-    const wsEvent = getWsEvent(event) as WsEventInit;
-    if (wsEvent.event !== "userAuth") {
-        return;
-    }
-
-    switch (wsEvent.payload.status) {
-        case "error":
+            if (this.onWsAutentication) this.onWsAutentication((wsEvent.payload.color) as Player);
+        } else {
             console.error("Couldn't initialize user", wsEvent.payload.msg);
-            return;
-        case "waiting":
-            console.warn("Waiting for other player", wsEvent.payload.msg);
-            return;
-        case "ready":
-            socket.removeEventListener("message", listener);
-            socket.addEventListener("message", (event) => {
-                handleWsBoardUpdate(event, handleBoardUpdate);
-            });
-            if (succesCb) succesCb((wsEvent.payload.color ?? null) as Player);
+        }
+    
     }
+
+    private handleBoardUpdate(event: MessageEvent){
+        const wsEvent = this.getWsEvent(event) as WsEventBoardUpdate
+        if(wsEvent.event !== "boardUpdate") return
+        const {board, turn} = wsEvent.payload
+        if(this.onBoardUpdate) this.onBoardUpdate(board, turn)
+    }
+    
 }

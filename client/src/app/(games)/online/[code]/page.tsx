@@ -5,9 +5,12 @@ import CustomFooter from "@/components/customFooter";
 import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
 import { Player, getEmptyBoard } from "@/modules/board";
-import { handleWsInit, wsSendUserConnect } from "@/modules/wsControll";
+import WsControll from "@/modules/wsControll";
 
 export default function Page() {
+    const wsControllRef: MutableRefObject<WsControll | undefined> = useRef();
+    let gameCode = 0;
+
     let board: Player[][] = getEmptyBoard();
     let turn: Player = null;
     let player: Player = null;
@@ -15,13 +18,12 @@ export default function Page() {
     const [boardView, setBoardView] = useState(board);
     const [turnMsg, setTurnMsg] = useState<string>(turn ?? "");
     const [modalOpen, setModalOpen] = useState(true);
-
-    let gameCode = 0;
     const [gameCodeView, setGameCodeView] = useState(gameCode);
-    const socketRef: MutableRefObject<WebSocket | undefined> = useRef();
 
     // --- Game init ---
-    function getGameCode() {
+
+    useEffect(() => {
+        // Get gamecode
         try {
             const devider = location.pathname.lastIndexOf("/");
             gameCode = Number(location.pathname.substring(devider + 1));
@@ -29,44 +31,27 @@ export default function Page() {
         } catch (error) {
             console.error(error);
         }
-    }
-    useEffect(getGameCode, []);
+    }, []);
 
-    function connectionSucced(color: Player) {
-        player = color;
-        setModalOpen(false);
-    }
+    useEffect(() => {
+        // Get ws controll
+        if (wsControllRef.current) return;
+    
+        try {
+            const socket = new WebSocket("ws://localhost:3040");
+            wsControllRef.current = new WsControll(socket, gameCode);   
+            wsControllRef.current.onWsAutentication = handleWsAthentication
+            wsControllRef.current.onBoardUpdate = handleBoardUpdate
+        } catch (error) {
+            console.error(error);
+        }
+        
+    }, []);
 
-    function handleWebsocket() {
-        if (socketRef.current) return;
+    // --- Game actions ---
 
-        socketRef.current = new WebSocket("ws://localhost:3040");
-
-        socketRef.current.addEventListener("open", () => {
-            if (!socketRef.current) return;
-
-            wsSendUserConnect(socketRef.current, {
-                gameCode,
-            });
-
-            const initLister = (event: MessageEvent) => {
-                if (socketRef.current)
-                    handleWsInit(
-                        event,
-                        socketRef.current,
-                        initLister,
-                        handleBoardUpdate,
-                        connectionSucced
-                    );
-            };
-
-            socketRef.current.addEventListener("message", initLister);
-        });
-    }
-    useEffect(handleWebsocket, []);
-
-    // --- App ---
     function handleExit() {
+        // TODO: handle ws
         if (
             confirm(
                 "Are you sure you want to exit game? It will be lost forever!"
@@ -77,16 +62,27 @@ export default function Page() {
     }
 
     function handleNewGame() {
+        // TODO: handle ws
+        
         board = getEmptyBoard();
         setBoardView(board);
     }
 
+    function handleWsAthentication(color: Player){
+        player = color
+        console.log("User authenticated as: " + color);
+    }
+
     function handleBoardUpdate(newBoard: Player[][], newTurn: Player) {
+        if(modalOpen) setModalOpen(false);
+
         board = newBoard;
         setBoardView(board);
+
         turn = newTurn;
-        setTurnMsg((player === turn ? "your" : "enemy's") + " turn!");
-        console.log("Update: " + turn);
+        setTurnMsg((player === turn && turn ? "your" : "enemy's") + " turn!");
+
+        console.log("Update, turn: " + turn);
     }
 
     // --- Render ---
@@ -96,6 +92,7 @@ export default function Page() {
                 board={boardView}
                 turnMsg={turnMsg}
                 handleNewGame={handleNewGame}
+                handleExit={handleExit}
             ></GamePage>
             <CustomModal open={modalOpen}>
                 <h2>Waiting for other player...</h2>

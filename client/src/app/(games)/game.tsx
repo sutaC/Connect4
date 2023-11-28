@@ -12,16 +12,18 @@ export default function GamePage({
     board,
     turnMsg,
     handleNewGame,
+    handleExit
 }: {
     board: Player[][];
     turnMsg: string;
-    handleNewGame?: () => void;
+    handleNewGame?: () => any;
+    handleExit?: () => any
 }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalOpacity, setModalOpacity] = useState(false);
     const [endMsg, setEndMsg] = useState("");
 
-    function handleExit() {
+    function handleExitThrowback() {
         if (
             confirm(
                 "Are you sure you want to exit game? It will be lost forever!"
@@ -79,7 +81,7 @@ export default function GamePage({
                     >
                         <CustomButton>Play again</CustomButton>
                     </div>
-                    <div onClick={handleExit}>
+                    <div onClick={handleExit ?? handleExitThrowback}>
                         <CustomButton>Exit</CustomButton>
                     </div>
                 </CustomModal>

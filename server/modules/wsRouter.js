@@ -1,4 +1,4 @@
-import { getEmptyBoard } from "./board.js";
+import { getEmptyBoard } from "./game.js";
 import { findGame, updateGame } from "./db.js";
 
 const clients = new Map();
@@ -52,7 +52,7 @@ async function handleUserConnect(event, socket, userId) {
         socket.send(
             createWsEvent("userAuth", {
                 status: "error",
-                msg: "Recived wrong event",
+                msg: "Game is already active",
             })
         );
         socket.close();
@@ -61,10 +61,8 @@ async function handleUserConnect(event, socket, userId) {
 
     let color;
     let oppId;
-    if (game.userRed === null && game.userYellow === null) {
-        color = "red";
-        updateGame(gameCode, userId, null);
-    } else if (game.userRed === null) {
+
+    if (game.userRed === null) {
         color = "red";
         updateGame(gameCode, userId, null);
         oppId = game.userYellow;
@@ -74,55 +72,41 @@ async function handleUserConnect(event, socket, userId) {
         oppId = game.userRed;
     }
 
-    if (oppId) {
-        const oppSocket = clients.get(oppId);
-        if (!oppSocket) {
-            socket.send(
-                createWsEvent("userAuth", {
-                    status: "error",
-                    msg: "Could not find opponent",
-                })
-            );
-            socket.close();
-            return;
-        }
+    socket.send(
+        createWsEvent("userAuth", {
+            status: "ok",
+            color,
+        })
+    );
 
-        sendGameStart(oppSocket, color === "red" ? "yellow" : "red");
+    if (!oppId) return
+    
+    const oppSocket = clients.get(oppId);
 
+    if (!oppSocket) {
         socket.send(
-            createWsEvent("boardUpdate", {
-                board: getEmptyBoard(),
-                turn: "red",
+            createWsEvent("userAuth", {
+                status: "error",
+                msg: "Opponent is not avaliable",
             })
         );
+        socket.close();
+        return;
     }
 
     socket.send(
-        createWsEvent("userAuth", {
-            status: oppId ? "ready" : "waiting",
-            color,
-        })
-    );
-}
-
-function sendGameStart(socket, color) {
-    socket.send(
-        createWsEvent("userAuth", {
-            status: "ready",
-            color,
+        createWsEvent("boardUpdate", {
+            board: getEmptyBoard(),
+            turn: "red",
         })
     );
 
-    setTimeout(
-        () =>
-            socket.send(
-                createWsEvent("boardUpdate", {
-                    board: getEmptyBoard(),
-                    turn: "red",
-                })
-            ),
-        2500
-    );
+    oppSocket.send(
+        createWsEvent("boardUpdate", {
+            board: getEmptyBoard(),
+            turn: "red",
+        })
+    )
 }
 
 export default function wsRouter(wss) {

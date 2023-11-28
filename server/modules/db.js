@@ -58,8 +58,7 @@ export async function findGame(gameCode) {
             .db()
             .collection("games")
             .findOne({
-                gameCode,
-                $or: [{ userRed: null }, { userYellow: null }],
+                gameCode
             });
         return game;
     } catch (error) {
