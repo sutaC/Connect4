@@ -1,5 +1,5 @@
 import WebSocket, { RawData, WebSocketServer } from "ws";
-import { getEmptyBoard } from "$/lib/modules/game";
+import { Player, getEmptyBoard, playMove } from "$/lib/modules/game";
 import { findGame, updateGame } from "$/lib/db/db";
 
 // --- Types ---
@@ -13,6 +13,13 @@ interface UserConnectWsEvent extends WsEvent {
     event: "userConnect";
     payload: {
         gameCode: number;
+    };
+}
+
+interface PlayerMoveWsEvent extends WsEvent {
+    event: "playerMove";
+    payload: {
+        row: number;
     };
 }
 
@@ -39,6 +46,8 @@ export default class WsService {
 }
 
 class WsClient {
+    private gameCode: number | undefined;
+
     constructor(
         private socket: WebSocket,
         private clientId: number,
@@ -110,6 +119,8 @@ class WsClient {
             return;
         }
 
+        this.gameCode = gameCode;
+
         let color: string;
         let oppId: number | null;
 
@@ -130,7 +141,7 @@ class WsClient {
             })
         );
 
-        // TODO: add board update handler
+        this.socket.on("message", this.handlePlayerMoveEvent.bind(this));
 
         if (!oppId) return;
 
@@ -162,5 +173,17 @@ class WsClient {
         );
     }
 
-    // TODO: board uopdate handler
+    private async handlePlayerMoveEvent(event: RawData) {
+        const wsEvent = JSON.parse(event.toString()) as PlayerMoveWsEvent;
+        if (wsEvent.event !== "playerMove") return;
+
+        if (!this.gameCode) return; // TODO: error handle
+        const game = await findGame(this.gameCode);
+        if (!game) return; // TODO: error handle
+
+        const player = game.userRed === this.clientId ? "red" : "yellow";
+
+        // playMove()
+        // TODO: db game board
+    }
 }

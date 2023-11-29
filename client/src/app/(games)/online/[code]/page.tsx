@@ -4,8 +4,9 @@ import GamePage from "../../game";
 import CustomFooter from "@/components/customFooter";
 import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
-import { Player, getEmptyBoard } from "@/modules/board";
+import { Player, getEmptyBoard, isMovePlayable } from "@/modules/board";
 import WsControll from "@/modules/wsControll";
+import { BoardClickEvent } from "@/components/board";
 
 export default function Page() {
     const wsControllRef: MutableRefObject<WsControll | undefined> = useRef();
@@ -36,19 +37,36 @@ export default function Page() {
     useEffect(() => {
         // Get ws controll
         if (wsControllRef.current) return;
-    
+
         try {
             const socket = new WebSocket("ws://localhost:3040");
-            wsControllRef.current = new WsControll(socket, gameCode);   
-            wsControllRef.current.onWsAutentication = handleWsAthentication
-            wsControllRef.current.onBoardUpdate = handleBoardUpdate
+            wsControllRef.current = new WsControll(socket, gameCode);
+            wsControllRef.current.onWsAutentication = handleWsAthentication;
+            wsControllRef.current.onBoardUpdate = handleBoardUpdate;
         } catch (error) {
             console.error(error);
         }
-        
+    }, []);
+
+    const boardClickeventListener = (e: Event) => {
+        handleBoardClick(e as BoardClickEvent);
+    };
+    useEffect(() => {
+        document.removeEventListener("boardClick", boardClickeventListener);
+        document.addEventListener("boardClick", boardClickeventListener);
     }, []);
 
     // --- Game actions ---
+
+    function handleBoardClick(event: BoardClickEvent) {
+        if (player !== turn || !player) return;
+
+        const { row } = event.detail;
+
+        if (!isMovePlayable(board, row)) return;
+
+        wsControllRef.current?.sendPlayerMoveEvent(row);
+    }
 
     function handleExit() {
         // TODO: handle ws
@@ -63,18 +81,18 @@ export default function Page() {
 
     function handleNewGame() {
         // TODO: handle ws
-        
+
         board = getEmptyBoard();
         setBoardView(board);
     }
 
-    function handleWsAthentication(color: Player){
-        player = color
+    function handleWsAthentication(color: Player) {
+        player = color;
         console.log("User authenticated as: " + color);
     }
 
     function handleBoardUpdate(newBoard: Player[][], newTurn: Player) {
-        if(modalOpen) setModalOpen(false);
+        if (modalOpen) setModalOpen(false);
 
         board = newBoard;
         setBoardView(board);

@@ -40,8 +40,6 @@ export default function Home() {
             gamePublic,
         });
 
-        console.log(body);
-
         const res = await fetch("http://localhost:3030/api/game/host/", {
             method: "POST",
             headers: {

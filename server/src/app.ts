@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { WebSocketServer } from "ws";
 import router from "$/lib/modules/router";
-import WsService from "$/lib/modules/wsRouter";
+import WsService from "$/lib/modules/wsService";
 
 const port = Number(process.env.PORT) ?? 3001;
 const wsport = Number(process.env.WSPORT) ?? 3002;
