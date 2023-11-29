@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import router from "./modules/router.js";
 import { WebSocketServer } from "ws";
-import wsRouter from "./modules/wsRouter.js";
+import router from "$/lib/modules/router";
+import wsRouter from "$/lib/modules/wsRouter";
 
-const port = process.env.PORT ?? 3001;
-const wsport = process.env.WSPORT ?? 3002;
+const port = Number(process.env.PORT) ?? 3001;
+const wsport = Number(process.env.WSPORT) ?? 3002;
 
 // APP
 

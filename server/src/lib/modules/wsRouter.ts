@@ -1,16 +1,37 @@
-import { getEmptyBoard } from "./game.js";
-import { findGame, updateGame } from "./db.js";
+import WebSocket, { RawData, WebSocketServer } from "ws";
+import { getEmptyBoard } from "$/lib/modules/game";
+import { findGame, updateGame } from "$/lib/db/db";
+
+// --- Setup ---
 
 const clients = new Map();
 
-// Func
+// --- Types ---
 
-function createWsEvent(event, data) {
+interface WsEvent {
+    event: string;
+    payload: {};
+}
+
+interface UserConnectWsEvent extends WsEvent {
+    event: "userConnect";
+    payload: {
+        gameCode: number;
+    };
+}
+
+// --- Functions ---
+
+function createWsEvent(event: string, data: {}) {
     return JSON.stringify({ event, payload: data });
 }
 
-async function handleUserConnect(event, socket, userId) {
-    const wsEvent = JSON.parse(event);
+async function handleUserConnect(
+    event: RawData,
+    socket: WebSocket,
+    userId: number
+) {
+    const wsEvent = JSON.parse(event.toString()) as UserConnectWsEvent;
 
     if (wsEvent.event !== "userConnect") {
         socket.send(
@@ -59,8 +80,8 @@ async function handleUserConnect(event, socket, userId) {
         return;
     }
 
-    let color;
-    let oppId;
+    let color: string;
+    let oppId: number | null;
 
     if (game.userRed === null) {
         color = "red";
@@ -79,8 +100,8 @@ async function handleUserConnect(event, socket, userId) {
         })
     );
 
-    if (!oppId) return
-    
+    if (!oppId) return;
+
     const oppSocket = clients.get(oppId);
 
     if (!oppSocket) {
@@ -106,11 +127,11 @@ async function handleUserConnect(event, socket, userId) {
             board: getEmptyBoard(),
             turn: "red",
         })
-    )
+    );
 }
 
-export default function wsRouter(wss) {
-    wss.on("connection", (socket) => {
+export default function wsRouter(wss: WebSocketServer) {
+    wss.on("connection", (socket: WebSocket) => {
         const userId = Date.now();
         clients.set(userId, socket);
 
