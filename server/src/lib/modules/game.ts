@@ -1,4 +1,6 @@
-export function getEmptyBoard() {
+export type Player = "red" | "yellow" | null;
+
+export function getEmptyBoard(): Player[][] {
     const board = new Array(6);
     for (let y = 0; y < board.length; y++) {
         board[y] = new Array(7);
