@@ -2,49 +2,71 @@
 import { useEffect, useState } from "react";
 import GamePage from "../game";
 import CustomFooter from "@/components/customFooter";
-import { Player, checkGameState, getEmptyBoard, playMove } from "@/modules/board";
+import {
+    Player,
+    checkGameState,
+    getEmptyBoard,
+    playMove,
+} from "@/modules/board";
 import { BoardClickEvent } from "@/components/board";
 
 export default function Page() {
-	let turn = "red";
-	let board: Player[][] = getEmptyBoard();
+    let turn = "red";
+    let board: Player[][] = getEmptyBoard();
 
-	const [boardView, setBoardView] = useState(board);
-	const [turnMsg, setTurnMsg] = useState(turn);
+    const [boardView, setBoardView] = useState(board);
+    const [turnMsg, setTurnMsg] = useState(turn);
 
-	function handleNewGame() {
-		location.reload();
-	}
+    function handleNewGame() {
+        location.reload();
+    }
 
-	function handleBoardClick(event: BoardClickEvent){
-		const {row} = event.detail;
-		
-		const move = playMove([...board], row, turn as Player)
-		if(!move) return;
-		board = move;
+    function handleBoardClick(event: BoardClickEvent) {
+        const { row } = event.detail;
 
-		setBoardView(board);
+        const move = playMove([...board], row, turn as Player);
+        if (!move) return;
+        board = move;
 
-		if(checkGameState(board, turn, document)) return;
+        setBoardView(board);
 
-		turn = turn === "red" ? "yellow" : "red";
-		setTurnMsg(turn);
-	}
-	const boardClickeventListener = (e: Event) => {handleBoardClick(e as BoardClickEvent)};
+        if (checkGameState(board, turn, document)) return;
 
-	useEffect(() => {
-		document.removeEventListener("boardClick", boardClickeventListener, true)
-		document.addEventListener("boardClick", boardClickeventListener)	
-	}, [])
+        turn = turn === "red" ? "yellow" : "red";
+        setTurnMsg(turn);
+    }
+    const boardClickeventListener = (e: Event) => {
+        handleBoardClick(e as BoardClickEvent);
+    };
 
-	return (
-		<>
-			<GamePage
-				board={boardView}
-				turnMsg={`${turnMsg} turn!`}
-				handleNewGame={handleNewGame}
-			></GamePage>
-			<CustomFooter>Local multiplayer</CustomFooter>
-		</>
-	);
+    function handleExit() {
+        if (
+            confirm(
+                "Are you sure you want to exit game? It will be lost forever!"
+            )
+        ) {
+            location.href = "/";
+        }
+    }
+
+    useEffect(() => {
+        document.removeEventListener(
+            "boardClick",
+            boardClickeventListener,
+            true
+        );
+        document.addEventListener("boardClick", boardClickeventListener);
+    }, []);
+
+    return (
+        <>
+            <GamePage
+                board={boardView}
+                turnMsg={`${turnMsg} turn!`}
+                handleNewGame={handleNewGame}
+                handleExit={handleExit}
+            ></GamePage>
+            <CustomFooter>Local multiplayer</CustomFooter>
+        </>
+    );
 }

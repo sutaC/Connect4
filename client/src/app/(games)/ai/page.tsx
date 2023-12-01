@@ -2,61 +2,83 @@
 import { useEffect, useState } from "react";
 import GamePage from "../game";
 import CustomFooter from "@/components/customFooter";
-import { Player, checkGameState, getEmptyBoard, playMove } from "@/modules/board";
+import {
+    Player,
+    checkGameState,
+    getEmptyBoard,
+    playMove,
+} from "@/modules/board";
 import { BoardClickEvent } from "@/components/board";
 import playAIMove from "@/modules/opponentAI";
 
 export default function Page() {
-	let turn = "red";
-	let board: Player[][] = getEmptyBoard();
+    let turn = "red";
+    let board: Player[][] = getEmptyBoard();
 
-	const [boardView, setBoardView] = useState(board);
-	const [turnMsg, setTurnMsg] = useState("your");
+    const [boardView, setBoardView] = useState(board);
+    const [turnMsg, setTurnMsg] = useState("your");
 
-	function handleNewGame() {
-		location.reload();
-	}
+    function handleNewGame() {
+        location.reload();
+    }
 
-	function handleBoardClick(event: BoardClickEvent){
-		const {row} = event.detail;
+    function handleExit() {
+        if (
+            confirm(
+                "Are you sure you want to exit game? It will be lost forever!"
+            )
+        ) {
+            location.href = "/";
+        }
+    }
 
-		const move = playMove([...board], row, turn as Player)
-		if(!move) return;
-		board = move;
+    function handleBoardClick(event: BoardClickEvent) {
+        const { row } = event.detail;
 
-		setBoardView(board);
+        const move = playMove([...board], row, turn as Player);
+        if (!move) return;
+        board = move;
 
-		if(checkGameState(board, "you", document)) return;
+        setBoardView(board);
 
-		turn = turn === "red" ? "yellow" : "red";
-		setTurnMsg("AI");
+        if (checkGameState(board, "you", document)) return;
 
-		// AI turn
+        turn = turn === "red" ? "yellow" : "red";
+        setTurnMsg("AI");
 
-		board = playAIMove([...board], turn as Player)
+        // AI turn
 
-		setBoardView(board);
+        board = playAIMove([...board], turn as Player);
 
-		if(checkGameState(board, "AI", document)) return;
+        setBoardView(board);
 
-		turn = turn === "red" ? "yellow" : "red";
-		setTurnMsg("your");
-	}
-	const boardClickeventListener = (e: Event) => {handleBoardClick(e as BoardClickEvent)};
+        if (checkGameState(board, "AI", document)) return;
 
-	useEffect(() => {
-		document.removeEventListener("boardClick", boardClickeventListener, true)
-		document.addEventListener("boardClick", boardClickeventListener)	
-	}, [])
+        turn = turn === "red" ? "yellow" : "red";
+        setTurnMsg("your");
+    }
+    const boardClickeventListener = (e: Event) => {
+        handleBoardClick(e as BoardClickEvent);
+    };
 
-	return (
-		<>
-			<GamePage
-				board={boardView}
-				turnMsg={`${turnMsg} turn!`}
-				handleNewGame={handleNewGame}
-			></GamePage>
-			<CustomFooter>Singleplayer with AI</CustomFooter>
-		</>
-	);
+    useEffect(() => {
+        document.removeEventListener(
+            "boardClick",
+            boardClickeventListener,
+            true
+        );
+        document.addEventListener("boardClick", boardClickeventListener);
+    }, []);
+
+    return (
+        <>
+            <GamePage
+                board={boardView}
+                turnMsg={`${turnMsg} turn!`}
+                handleNewGame={handleNewGame}
+                handleExit={handleExit}
+            ></GamePage>
+            <CustomFooter>Singleplayer with AI</CustomFooter>
+        </>
+    );
 }

@@ -12,26 +12,16 @@ export default function GamePage({
     board,
     turnMsg,
     handleNewGame,
-    handleExit
+    handleExit,
 }: {
     board: Player[][];
     turnMsg: string;
     handleNewGame?: () => any;
-    handleExit?: () => any
+    handleExit?: () => any;
 }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalOpacity, setModalOpacity] = useState(false);
     const [endMsg, setEndMsg] = useState("");
-
-    function handleExitThrowback() {
-        if (
-            confirm(
-                "Are you sure you want to exit game? It will be lost forever!"
-            )
-        ) {
-            location.href = "/";
-        }
-    }
 
     function gameEnd(event: GameOverEvent) {
         setEndMsg(event.detail.msg);
@@ -81,7 +71,7 @@ export default function GamePage({
                     >
                         <CustomButton>Play again</CustomButton>
                     </div>
-                    <div onClick={handleExit ?? handleExitThrowback}>
+                    <div onClick={handleExit}>
                         <CustomButton>Exit</CustomButton>
                     </div>
                 </CustomModal>

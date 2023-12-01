@@ -74,9 +74,14 @@ export default function Home() {
     }
 
     async function handleFindGame() {
-        const res = await fetch("http://localhost:3030/api/game/find");
+        let res;
 
-        if (!res.ok) return console.error("Couldn't connect to the server");
+        try {
+            res = await fetch("http://localhost:3030/api/game/find");
+        } catch (error) {
+            console.error(error);
+            return;
+        }
 
         let data: undefined | { code: number };
 
