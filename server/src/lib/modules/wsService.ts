@@ -1,6 +1,6 @@
 import WebSocket, { RawData, WebSocketServer } from "ws";
-import { Player, getEmptyBoard, playMove } from "$/lib/modules/game";
-import { findGame, updateGame } from "$/lib/db/db";
+import { getEmptyBoard, playMove } from "$/lib/modules/game";
+import * as db from "$/lib/db/db";
 
 // --- Types ---
 
@@ -54,7 +54,7 @@ class WsClient {
         private service: WsService
     ) {
         socket.on("close", () => {
-            // TODO: handle db game user deletion
+            if (this.gameCode) db.deleteGame(this.gameCode);
             // TODO: handle opponnet notification
         });
 
@@ -95,7 +95,7 @@ class WsClient {
             return;
         }
 
-        const game = await findGame(gameCode);
+        const game = await db.findGame(gameCode);
 
         if (!game) {
             this.socket.send(
@@ -126,11 +126,11 @@ class WsClient {
 
         if (game.userRed === null) {
             color = "red";
-            updateGame(gameCode, this.clientId, null);
+            db.updateGameUsers(gameCode, this.clientId, null);
             oppId = game.userYellow;
         } else {
             color = "yellow";
-            updateGame(gameCode, null, this.clientId);
+            db.updateGameUsers(gameCode, null, this.clientId);
             oppId = game.userRed;
         }
 
@@ -175,15 +175,31 @@ class WsClient {
 
     private async handlePlayerMoveEvent(event: RawData) {
         const wsEvent = JSON.parse(event.toString()) as PlayerMoveWsEvent;
+
         if (wsEvent.event !== "playerMove") return;
 
         if (!this.gameCode) return; // TODO: error handle
-        const game = await findGame(this.gameCode);
+
+        const game = await db.findGame(this.gameCode);
         if (!game) return; // TODO: error handle
 
         const player = game.userRed === this.clientId ? "red" : "yellow";
+        const opponent = this.service.findClient(
+            (player === "red" ? game.userYellow : game.userRed) as number
+        );
+        if (!opponent) return; // TODO: error handle
 
-        // playMove()
-        // TODO: db game board
+        const board = playMove(game.board, wsEvent.payload.row, player);
+        if (!board) return; // TODO: error handle
+
+        db.updateGameBoard(this.gameCode, board);
+
+        const boardUpdateEvent = this.createWsEvent("boardUpdate", {
+            board,
+            turn: player === "red" ? "yellow" : "red",
+        });
+
+        this.socket.send(boardUpdateEvent);
+        opponent.send(boardUpdateEvent);
     }
 }
