@@ -1,5 +1,10 @@
 import WebSocket, { RawData, WebSocketServer } from "ws";
-import { getEmptyBoard, playMove } from "$/lib/modules/game";
+import {
+    checkDraw,
+    checkGameOver,
+    getEmptyBoard,
+    playMove,
+} from "$/lib/modules/game";
 import * as db from "$/lib/db/db";
 
 // --- Types ---
@@ -242,6 +247,8 @@ class WsClient {
 
         db.updateGameBoard(this.gameCode, board);
 
+        // TODO: check game end
+
         const boardUpdateEvent = this.createWsEvent("boardUpdate", {
             board,
             turn: player === "red" ? "yellow" : "red",
@@ -249,5 +256,21 @@ class WsClient {
 
         this.socket.send(boardUpdateEvent);
         opponent.send(boardUpdateEvent);
+
+        let gameEndEvent;
+        if (checkDraw(board)) {
+            gameEndEvent = this.createWsEvent("gameEnd", {
+                result: null,
+            });
+        } else if (checkGameOver(board)) {
+            gameEndEvent = this.createWsEvent("gameEnd", {
+                result: player,
+            });
+        }
+
+        if (gameEndEvent) {
+            this.socket.send(gameEndEvent);
+            opponent.send(gameEndEvent);
+        }
     }
 }

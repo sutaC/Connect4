@@ -6,6 +6,7 @@ interface WsEvent {
 }
 
 interface WsEventBoardUpdate extends WsEvent {
+    event: "boardUpdate";
     payload: {
         board: Player[][];
         turn: Player;
@@ -13,6 +14,7 @@ interface WsEventBoardUpdate extends WsEvent {
 }
 
 interface WsEventAuthentication extends WsEvent {
+    event: "userAuth";
     payload: {
         color: string;
     };
@@ -26,6 +28,13 @@ interface WsEventError extends WsEvent {
     };
 }
 
+interface WsEventGameEnd extends WsEvent {
+    event: "gameEnd";
+    payload: {
+        result: Player;
+    };
+}
+
 export default class WsControll {
     private socket: WebSocket;
     private gameCode: number;
@@ -34,6 +43,7 @@ export default class WsControll {
     public onWsAutentication?: (color: Player) => any;
     public onBoardUpdate?: (board: Player[][], turn: Player) => any;
     public onWsError?: (msg: string, critical?: boolean) => any;
+    public onGameEnd?: (result: Player) => any;
 
     constructor(socket: WebSocket, gameCode: number) {
         this.socket = socket;
@@ -94,6 +104,7 @@ export default class WsControll {
             "message",
             this.handleBoardUpdate.bind(this)
         );
+        this.socket.addEventListener("message", this.handleGameEnd.bind(this));
 
         if (this.onWsAutentication)
             this.onWsAutentication(wsEvent.payload.color as Player);
@@ -112,6 +123,14 @@ export default class WsControll {
         const { msg, critical } = wsEvent.payload;
         if (this.onWsError) this.onWsError(msg, critical);
         else console.error(wsEvent);
+    }
+
+    private handleGameEnd(event: MessageEvent) {
+        const wsEvent = this.getWsEvent(event) as WsEventGameEnd;
+        if (wsEvent.event !== "gameEnd") return;
+        const { result } = wsEvent.payload;
+        if (this.onGameEnd) this.onGameEnd(result);
+        else console.log(wsEvent);
     }
 
     // --- Sending events ---

@@ -1,6 +1,6 @@
 "use client";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
-import GamePage from "../../game";
+import GamePage, { GameOverEvent } from "../../game";
 import CustomFooter from "@/components/customFooter";
 import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
@@ -44,6 +44,7 @@ export default function Page() {
             wsControllRef.current.onWsAutentication = handleWsAthentication;
             wsControllRef.current.onBoardUpdate = handleBoardUpdate;
             wsControllRef.current.onWsError = handleWsError;
+            wsControllRef.current.onGameEnd = handleGameEnd;
         } catch (error) {
             console.error(error);
         }
@@ -70,7 +71,6 @@ export default function Page() {
     }
 
     function handleExit() {
-        // TODO: handle ws
         if (
             confirm(
                 "Are you sure you want to exit game? It will be lost forever!"
@@ -100,6 +100,20 @@ export default function Page() {
 
         turn = newTurn;
         setTurnMsg((player === turn && turn ? "your" : "enemy's") + " turn!");
+    }
+
+    function handleGameEnd(result: Player) {
+        let gameOverEvent: GameOverEvent;
+        if (result) {
+            gameOverEvent = new CustomEvent("gameOver", {
+                detail: { msg: `${result} won!` },
+            });
+        } else {
+            gameOverEvent = new CustomEvent("gameOver", {
+                detail: { msg: "Draw!" },
+            });
+        }
+        document.dispatchEvent(gameOverEvent);
     }
 
     function handleWsError(msg: string, critical?: boolean) {
