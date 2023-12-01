@@ -53,9 +53,26 @@ class WsClient {
         private clientId: number,
         private service: WsService
     ) {
-        socket.on("close", () => {
-            if (this.gameCode) db.deleteGame(this.gameCode);
-            // TODO: handle opponnet notification
+        socket.on("close", async () => {
+            if (!this.gameCode) return;
+
+            const game = await db.findGame(this.gameCode);
+            if (!game) return;
+            await db.deleteGame(this.gameCode);
+
+            const oppId =
+                this.clientId === game.userRed ? game.userYellow : game.userRed;
+            if (!oppId) return;
+
+            const opponent = this.service.findClient(oppId);
+            if (!opponent) return;
+
+            opponent.send(
+                this.createWsEvent("error", {
+                    msg: "Opponent disconnected",
+                    critical: true,
+                })
+            );
         });
 
         socket.once("message", this.handleUserConnectEvent.bind(this));
@@ -74,9 +91,9 @@ class WsClient {
 
         if (wsEvent.event !== "userConnect") {
             this.socket.send(
-                this.createWsEvent("userAuth", {
-                    status: "error",
+                this.createWsEvent("error", {
                     msg: "Recived wrong event",
+                    critical: true,
                 })
             );
             this.socket.close();
@@ -86,9 +103,9 @@ class WsClient {
         const gameCode = wsEvent.payload.gameCode;
         if (typeof gameCode !== "number") {
             this.socket.send(
-                this.createWsEvent("userAuth", {
-                    status: "error",
+                this.createWsEvent("error", {
                     msg: "Wrong game code provided",
+                    critical: true,
                 })
             );
             this.socket.close();
@@ -99,9 +116,9 @@ class WsClient {
 
         if (!game) {
             this.socket.send(
-                this.createWsEvent("userAuth", {
-                    status: "error",
+                this.createWsEvent("error", {
                     msg: "Game was not found",
+                    critical: true,
                 })
             );
             this.socket.close();
@@ -110,9 +127,9 @@ class WsClient {
 
         if (game.userRed !== null && game.userYellow !== null) {
             this.socket.send(
-                this.createWsEvent("userAuth", {
-                    status: "error",
+                this.createWsEvent("error", {
                     msg: "Game is already active",
+                    critical: true,
                 })
             );
             this.socket.close();
@@ -136,7 +153,6 @@ class WsClient {
 
         this.socket.send(
             this.createWsEvent("userAuth", {
-                status: "ok",
                 color,
             })
         );
@@ -149,9 +165,9 @@ class WsClient {
 
         if (!oppSocket) {
             this.socket.send(
-                this.createWsEvent("userAuth", {
-                    status: "error",
+                this.createWsEvent("error", {
                     msg: "Opponent is not avaliable",
+                    critical: true,
                 })
             );
             this.socket.close();
@@ -178,19 +194,51 @@ class WsClient {
 
         if (wsEvent.event !== "playerMove") return;
 
-        if (!this.gameCode) return; // TODO: error handle
+        if (!this.gameCode) {
+            this.socket.send(
+                this.createWsEvent("error", {
+                    msg: "Cannot acces gamecode on server",
+                })
+            );
+            return;
+        }
 
         const game = await db.findGame(this.gameCode);
-        if (!game) return; // TODO: error handle
+        if (!game) {
+            this.socket.send(
+                this.createWsEvent("error", {
+                    msg: `Cannot find game with gamecode ${this.gameCode}`,
+                    critical: true,
+                })
+            );
+            this.socket.close();
+            return;
+        }
 
         const player = game.userRed === this.clientId ? "red" : "yellow";
         const opponent = this.service.findClient(
             (player === "red" ? game.userYellow : game.userRed) as number
         );
-        if (!opponent) return; // TODO: error handle
+        if (!opponent) {
+            this.socket.send(
+                this.createWsEvent("error", {
+                    msg: "Opponent is not avaliable",
+                    critical: true,
+                })
+            );
+            this.socket.close();
+            return;
+        }
 
         const board = playMove(game.board, wsEvent.payload.row, player);
-        if (!board) return; // TODO: error handle
+        if (!board) {
+            this.socket.send(
+                this.createWsEvent("error", {
+                    msg: "Player cannot play that move",
+                })
+            );
+            return;
+        }
 
         db.updateGameBoard(this.gameCode, board);
 

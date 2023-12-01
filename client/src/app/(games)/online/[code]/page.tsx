@@ -43,6 +43,7 @@ export default function Page() {
             wsControllRef.current = new WsControll(socket, gameCode);
             wsControllRef.current.onWsAutentication = handleWsAthentication;
             wsControllRef.current.onBoardUpdate = handleBoardUpdate;
+            wsControllRef.current.onWsError = handleWsError;
         } catch (error) {
             console.error(error);
         }
@@ -99,8 +100,12 @@ export default function Page() {
 
         turn = newTurn;
         setTurnMsg((player === turn && turn ? "your" : "enemy's") + " turn!");
+    }
 
-        console.log("Update, turn: " + turn);
+    function handleWsError(msg: string, critical?: boolean) {
+        if (critical) console.error("CRITICAL::" + msg);
+        else console.warn(msg);
+        // TODO: User gui
     }
 
     // --- Render ---

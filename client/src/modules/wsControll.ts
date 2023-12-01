@@ -14,9 +14,15 @@ interface WsEventBoardUpdate extends WsEvent {
 
 interface WsEventAuthentication extends WsEvent {
     payload: {
-        status: "ok" | "error";
-        msg?: string;
-        color?: string;
+        color: string;
+    };
+}
+
+interface WsEventError extends WsEvent {
+    event: "error";
+    payload: {
+        msg: string;
+        critical?: boolean;
     };
 }
 
@@ -27,12 +33,14 @@ export default class WsControll {
 
     public onWsAutentication?: (color: Player) => any;
     public onBoardUpdate?: (board: Player[][], turn: Player) => any;
+    public onWsError?: (msg: string, critical?: boolean) => any;
 
     constructor(socket: WebSocket, gameCode: number) {
         this.socket = socket;
         this.gameCode = gameCode;
 
         this.socket.addEventListener("open", this.handleWsOpen.bind(this));
+        // TODO: add socket on close
     }
 
     // --- Methods ---
@@ -60,6 +68,7 @@ export default class WsControll {
         this.sendMessage("userConnect", data);
 
         this.socket.addEventListener("message", this.handleUserInit.bind(this));
+        this.socket.addEventListener("message", this.handleError.bind(this));
     }
 
     private handleUserInit(event: MessageEvent) {
@@ -68,30 +77,26 @@ export default class WsControll {
         if (wsEvent.event !== "userAuth") {
             if (!this.authenticated) {
                 return console.warn(
-                    "User was not authenticated and recived: ",
+                    "User was not authenticated but recived: ",
                     wsEvent
                 );
             }
             return;
         }
 
-        if (wsEvent.payload.status === "ok") {
-            this.authenticated = true;
-            this.socket.removeEventListener(
-                "message",
-                this.handleUserInit.bind(this)
-            );
+        this.authenticated = true;
+        this.socket.removeEventListener(
+            "message",
+            this.handleUserInit.bind(this)
+        );
 
-            this.socket.addEventListener(
-                "message",
-                this.handleBoardUpdate.bind(this)
-            );
+        this.socket.addEventListener(
+            "message",
+            this.handleBoardUpdate.bind(this)
+        );
 
-            if (this.onWsAutentication)
-                this.onWsAutentication(wsEvent.payload.color as Player);
-        } else {
-            console.error("Couldn't initialize user", wsEvent.payload.msg);
-        }
+        if (this.onWsAutentication)
+            this.onWsAutentication(wsEvent.payload.color as Player);
     }
 
     private handleBoardUpdate(event: MessageEvent) {
@@ -99,6 +104,14 @@ export default class WsControll {
         if (wsEvent.event !== "boardUpdate") return;
         const { board, turn } = wsEvent.payload;
         if (this.onBoardUpdate) this.onBoardUpdate(board, turn);
+    }
+
+    private handleError(event: MessageEvent) {
+        const wsEvent = this.getWsEvent(event) as WsEventError;
+        if (wsEvent.event !== "error") return;
+        const { msg, critical } = wsEvent.payload;
+        if (this.onWsError) this.onWsError(msg, critical);
+        else console.error(wsEvent);
     }
 
     // --- Sending events ---

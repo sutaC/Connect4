@@ -24,11 +24,16 @@ export default function Home() {
             return;
         }
 
-        const res = await fetch(`http://localhost:3030/api/game/join/${data}`);
-
-        if (res.status === 200) {
-            location.href = `/online/${data}`;
-        } else {
+        try {
+            const res = await fetch(
+                `http://localhost:3030/api/game/join/${data}`
+            );
+            if (res.ok) {
+                location.href = `/online/${data}`;
+            } else {
+                console.error("Couldn't find game : " + data);
+            }
+        } catch (error) {
             console.error("Couldn't find game : " + data);
         }
     }
@@ -40,13 +45,20 @@ export default function Home() {
             gamePublic,
         });
 
-        const res = await fetch("http://localhost:3030/api/game/host/", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json",
-            },
-            body,
-        });
+        let res;
+
+        try {
+            res = await fetch("http://localhost:3030/api/game/host/", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body,
+            });
+        } catch (error) {
+            console.error(error);
+            return;
+        }
 
         let data: undefined | { code: number };
 

@@ -209,5 +209,5 @@ export default function playAIMove(
     board: Player[][],
     color: Player
 ): Player[][] {
-    return minimax(board, color, 4);
+    return minimax(board, color, 3);
 }
