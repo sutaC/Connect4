@@ -8,12 +8,15 @@ const client = new MongoClient(process.env.MONGODB_URL);
 
 // --- Types ---
 
+type GameStatus = "waiting" | "active";
+
 interface Game {
     gameCode: number;
     gamePublic: boolean;
     userRed: number | null;
     userYellow: number | null;
     board: Player[][];
+    status: GameStatus;
 }
 
 // --- Functions ---
@@ -33,6 +36,7 @@ export async function createGame(
                 userRed: null,
                 userYellow: null,
                 board: getEmptyBoard(),
+                status: "waiting",
             } as Game);
     } catch (error) {
         console.error(error);
@@ -59,7 +63,6 @@ export async function findPublicGame(): Promise<number | null> {
     } finally {
         await client.close();
     }
-    return null;
 }
 
 export async function findGame(gameCode: number): Promise<Game | null> {
@@ -104,6 +107,27 @@ export async function updateGameUsers(
                 }
             );
         }
+    } catch (error) {
+        console.error(error);
+    } finally {
+        await client.close();
+    }
+}
+
+export async function updateGameStatus(
+    gameCode: number,
+    status: GameStatus
+): Promise<void> {
+    await client.connect();
+    try {
+        await client.db().collection("games").updateOne(
+            { gameCode },
+            {
+                $set: {
+                    status,
+                },
+            }
+        );
     } catch (error) {
         console.error(error);
     } finally {

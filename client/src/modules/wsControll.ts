@@ -50,7 +50,6 @@ export default class WsControll {
         this.gameCode = gameCode;
 
         this.socket.addEventListener("open", this.handleWsOpen.bind(this));
-        // TODO: add socket on close
     }
 
     // --- Methods ---
@@ -137,5 +136,9 @@ export default class WsControll {
 
     public sendPlayerMoveEvent(row: number): void {
         this.sendMessage("playerMove", { row });
+    }
+
+    public sendNewGameEvent(): void {
+        this.sendMessage("newGame", {});
     }
 }

@@ -81,10 +81,9 @@ export default function Page() {
     }
 
     function handleNewGame() {
-        // TODO: handle ws
+        wsControllRef.current?.sendNewGameEvent();
 
-        board = getEmptyBoard();
-        setBoardView(board);
+        setModalOpen(true);
     }
 
     function handleWsAthentication(color: Player) {

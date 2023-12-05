@@ -148,11 +148,11 @@ class WsClient {
 
         if (game.userRed === null) {
             color = "red";
-            db.updateGameUsers(gameCode, this.clientId, null);
+            await db.updateGameUsers(gameCode, this.clientId, null);
             oppId = game.userYellow;
         } else {
             color = "yellow";
-            db.updateGameUsers(gameCode, null, this.clientId);
+            await db.updateGameUsers(gameCode, null, this.clientId);
             oppId = game.userRed;
         }
 
@@ -178,6 +178,8 @@ class WsClient {
             this.socket.close();
             return;
         }
+
+        await db.updateGameStatus(gameCode, "active");
 
         this.socket.send(
             this.createWsEvent("boardUpdate", {
@@ -245,9 +247,7 @@ class WsClient {
             return;
         }
 
-        db.updateGameBoard(this.gameCode, board);
-
-        // TODO: check game end
+        await db.updateGameBoard(this.gameCode, board);
 
         const boardUpdateEvent = this.createWsEvent("boardUpdate", {
             board,
@@ -271,6 +271,76 @@ class WsClient {
         if (gameEndEvent) {
             this.socket.send(gameEndEvent);
             opponent.send(gameEndEvent);
+
+            this.socket.once("message", this.handleNewGame.bind(this));
+            opponent.once("message", this.handleNewGame.bind(this));
         }
+    }
+
+    private async handleNewGame(event: RawData) {
+        const wsEvent = JSON.parse(event.toString()) as WsEvent;
+
+        if (wsEvent.event !== "newGame") return;
+
+        if (!this.gameCode) {
+            this.socket.send(
+                this.createWsEvent("error", {
+                    msg: "Cannot acces gamecode on server",
+                })
+            );
+            return;
+        }
+
+        const game = await db.findGame(this.gameCode);
+        if (!game) {
+            this.socket.send(
+                this.createWsEvent("error", {
+                    msg: `Cannot find game with gamecode ${this.gameCode}`,
+                    critical: true,
+                })
+            );
+            this.socket.close();
+            return;
+        }
+
+        const opponent = this.service.findClient(
+            (this.clientId === game.userRed
+                ? game.userYellow
+                : game.userRed) as number
+        );
+        if (!opponent) {
+            this.socket.send(
+                this.createWsEvent("error", {
+                    msg: "Opponent is not avaliable",
+                    critical: true,
+                })
+            );
+            this.socket.close();
+            return;
+        }
+
+        if (game.status === "active") {
+            await db.updateGameStatus(this.gameCode, "waiting");
+            return;
+        }
+
+        const board = getEmptyBoard();
+
+        await db.updateGameStatus(this.gameCode, "active");
+        await db.updateGameBoard(this.gameCode, board);
+
+        this.socket.send(
+            this.createWsEvent("boardUpdate", {
+                board,
+                turn: "red",
+            })
+        );
+
+        opponent.send(
+            this.createWsEvent("boardUpdate", {
+                board,
+                turn: "red",
+            })
+        );
     }
 }
