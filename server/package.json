@@ -5,8 +5,8 @@
     "main": "./src/app.ts",
     "type": "module",
     "scripts": {
-        "start": "rm /tmp/tsx-0 -r && tsx ./src/app.ts",
-        "dev": "rm /tmp/tsx-0 -r && tsx watch ./src/app.ts"
+        "start": "rm /tmp/tsx-0 -r -f && tsx ./src/app.ts",
+        "dev": "rm /tmp/tsx-0 -r -f && tsx watch ./src/app.ts"
     },
     "keywords": [],
     "author": "",
