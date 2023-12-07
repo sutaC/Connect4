@@ -1,36 +1,40 @@
 .customButton {
-    width: 100%;
+	width: 100%;
 
-    padding: 0.5em 4em;
+	padding: 0.5em 4em;
 
-    border: none;
-    border-radius: 2rem;
-    outline: none;
-    box-shadow: 0 4px 4px #00000088;
+	border: none;
+	border-radius: 2rem;
+	outline: none;
+	box-shadow: 0 4px 4px #00000088;
 
-    font-size: 1rem;
-    cursor: pointer;
-    user-select: none;
+	font-size: 1rem;
+	cursor: pointer;
+	user-select: none;
 }
 
 .customButton:hover,
 .customButton:focus {
-    opacity: 0.8;
+	opacity: 0.8;
 }
 
 .customButton:active {
-    opacity: 0.75;
-    box-shadow: inset 0 4px 4px #00000088;
+	opacity: 0.75;
+	box-shadow: inset 0 4px 4px #00000088;
 }
 
 .customButton:disabled {
-    opacity: 0.25;
+	opacity: 0.25;
 }
 
 .primary {
-    background-color: var(--primary);
+	background-color: var(--primary);
 }
 
 .secondary {
-    background-color: var(--secondary);
+	background-color: var(--secondary);
+}
+
+.accent {
+	background-color: var(--accent);
 }

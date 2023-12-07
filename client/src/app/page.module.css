@@ -1,96 +1,109 @@
 .main {
-    text-align: center;
+	text-align: center;
 }
 
 .main > h1 {
-    margin-bottom: 4rem;
+	margin-bottom: 4rem;
 }
 
 .menu > * {
-    margin-bottom: 2rem;
+	margin-bottom: 2rem;
 }
 
 .modalHeader {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .modalBtn {
-    align-self: end;
-    width: fit-content;
+	align-self: end;
+	width: fit-content;
 
-    border: none;
+	border: none;
 
-    cursor: pointer;
-    background: transparent;
-    font-size: 0.75rem;
-    color: var(--accent);
-    text-decoration: underline;
+	cursor: pointer;
+	background: transparent;
+	font-size: 0.75rem;
+	color: var(--accent);
+	text-decoration: underline;
 }
 
 .modalForm {
-    padding: 1rem;
+	padding: 1rem;
 
-    border: 1px solid var(--accent);
-    border-radius: 1rem;
-    box-shadow: 0 4px 4px #00000088;
+	border: 1px solid var(--accent);
+	border-radius: 1rem;
+	box-shadow: 0 4px 4px #00000088;
 
-    text-align: left;
+	text-align: left;
 }
 
 .modalForm > input,
 .modalForm > .customCheckbox {
-    margin: 1rem 0;
+	margin: 1rem 0;
 }
 
 .modalForm > input {
-    width: 100%;
-    padding: 1rem;
+	width: 100%;
+	padding: 1rem;
 
-    border: none;
-    border-radius: 1rem;
-    box-shadow: inset 0 4px 4px #00000088;
+	border: none;
+	border-radius: 1rem;
+	box-shadow: inset 0 4px 4px #00000088;
 
-    background: var(--secondary);
-    color: var(--accent);
+	background: var(--secondary);
+	color: var(--accent);
 }
 
 .customCheckbox > input {
-    visibility: hidden;
+	visibility: hidden;
 }
 
 .customCheckbox > input::after {
-    visibility: visible;
-    content: " ";
-    display: block;
-    cursor: pointer;
+	visibility: visible;
+	content: " ";
+	display: block;
+	cursor: pointer;
 
-    width: 1rem;
-    aspect-ratio: 1;
+	width: 1rem;
+	aspect-ratio: 1;
 
-    border-radius: 100%;
-    box-shadow: 0 4px 4px #00000088;
+	border-radius: 100%;
+	box-shadow: 0 4px 4px #00000088;
 
-    background-color: var(--primary);
+	background-color: var(--primary);
 }
 
 .customCheckbox > input:hover:after,
 .customCheckbox > input:focus:after {
-    opacity: 0.8;
+	opacity: 0.8;
 }
 
 .customCheckbox > input:checked:after {
-    content: "X";
-    text-align: center;
-    font-weight: bold;
-    font-size: 0.75rem;
-    line-height: 1rem;
-    color: var(--secondary);
+	content: "X";
+	text-align: center;
+	font-weight: bold;
+	font-size: 0.75rem;
+	line-height: 1rem;
+	color: var(--secondary);
 }
 
 .customCheckbox > label {
-    margin-left: 0.5rem;
-    cursor: pointer;
-    user-select: none;
+	margin-left: 0.5rem;
+	cursor: pointer;
+	user-select: none;
+}
+
+.errorMsg:empty {
+	display: none;
+}
+
+.errorMsg {
+	padding: 0.5rem;
+
+	box-shadow: 0 4px 4px #00000088;
+	border-radius: 2rem;
+
+	background-color: var(--accent);
 }
