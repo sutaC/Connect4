@@ -1,11 +1,11 @@
 "use client";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
-import GamePage, { GameOverEvent } from "../../game";
 import CustomFooter from "@/components/customFooter";
 import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
-import { Player, getEmptyBoard, isMovePlayable } from "@/modules/board";
 import WsControll from "@/modules/wsControll";
+import GamePage, { GameOverEvent } from "../../game";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { Player, getEmptyBoard, isMovePlayable } from "@/modules/board";
 import { BoardClickEvent } from "@/components/board";
 
 export default function Page() {
@@ -14,7 +14,8 @@ export default function Page() {
 
 	let board: Player[][] = getEmptyBoard();
 	let turn: Player = null;
-	let player: Player = null;
+
+	const [player, setPlayer] = useState<Player>(null);
 
 	const [boardView, setBoardView] = useState(board);
 	const [turnMsg, setTurnMsg] = useState<string>(turn ?? "");
@@ -89,7 +90,7 @@ export default function Page() {
 	}
 
 	function handleWsAthentication(color: Player) {
-		player = color;
+		setPlayer(color);
 		console.log("User authenticated as: " + color);
 	}
 
@@ -137,6 +138,7 @@ export default function Page() {
 			<GamePage
 				board={boardView}
 				turnMsg={turnMsg}
+				playerMsg={!!player ? `You are ${player}` : ""}
 				handleNewGame={handleNewGame}
 				handleExit={handleExit}
 			></GamePage>
