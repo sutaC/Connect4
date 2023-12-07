@@ -326,6 +326,7 @@ class WsClient {
 
         const board = getEmptyBoard();
 
+        await db.updateGameLTU(this.gameCode);
         await db.updateGameStatus(this.gameCode, "active");
         await db.updateGameBoard(this.gameCode, board);
 

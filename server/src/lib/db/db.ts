@@ -17,6 +17,7 @@ interface Game {
     userYellow: number | null;
     board: Player[][];
     status: GameStatus;
+    lastTimeUsed: Date;
 }
 
 // --- Functions ---
@@ -37,6 +38,7 @@ export async function createGame(
                 userYellow: null,
                 board: getEmptyBoard(),
                 status: "waiting",
+                lastTimeUsed: new Date(),
             } as Game);
     } catch (error) {
         console.error(error);
@@ -160,6 +162,38 @@ export async function deleteGame(gameCode: number): Promise<void> {
     await client.connect();
     try {
         await client.db().collection("games").deleteOne({ gameCode });
+    } catch (error) {
+        console.error(error);
+    } finally {
+        await client.close();
+    }
+}
+
+export async function deleteOldGames() {
+    await client.connect();
+    try {
+        await client
+            .db()
+            .collection("games")
+            .deleteMany({
+                lastTimeUsed: {
+                    $lte: new Date(new Date().getTime() - 1000 * 60 * 60),
+                },
+            });
+    } catch (error) {
+        console.error(error);
+    } finally {
+        await client.close();
+    }
+}
+
+export async function updateGameLTU(gameCode: number) {
+    await client.connect();
+    try {
+        await client
+            .db()
+            .collection("games")
+            .updateOne({ gameCode }, { lastTimeUsed: new Date() });
     } catch (error) {
         console.error(error);
     } finally {
