@@ -1,55 +1,59 @@
 .exitButton {
-	position: fixed;
-	right: 1rem;
-	top: 1rem;
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
 
-	border: none;
+    border: none;
 
-	font-size: 0.75rem;
-	text-decoration: underline;
-	color: var(--accent);
-	background: transparent;
-	cursor: pointer;
+    font-size: 0.75rem;
+    text-decoration: underline;
+    color: var(--accent);
+    background: transparent;
+    cursor: pointer;
 }
 
 .main h1 {
-	font-size: 3rem;
-	text-align: center;
-	text-transform: capitalize;
-	user-select: none;
+    font-size: 3rem;
+    text-align: center;
+    text-transform: capitalize;
+    user-select: none;
 }
 
 .endMsg {
-	text-transform: capitalize;
+    text-transform: capitalize;
 }
 
 .modalHeader {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .modalBtn {
-	align-self: end;
-	width: fit-content;
+    align-self: end;
+    width: fit-content;
 
-	border: none;
+    border: none;
 
-	cursor: pointer;
-	background: transparent;
-	font-size: 0.75rem;
-	color: var(--accent);
-	text-decoration: underline;
+    cursor: pointer;
+    background: transparent;
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-decoration: underline;
 }
 
 .opacity dialog,
 .opacity dialog::backdrop {
-	opacity: 0.5;
+    opacity: 0.5;
 }
 
 .playerMsg {
-	padding-top: 1rem;
+    padding-top: 0.5em;
 
-	text-align: center;
-	color: var(--accent);
+    text-align: center;
+    color: var(--accent);
+}
+
+.playerMsg:empty {
+    display: none;
 }
