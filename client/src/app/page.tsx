@@ -7,169 +7,175 @@ import styles from "./page.module.css";
 import { FormEvent, useState } from "react";
 
 export default function Home() {
-	const [modalOpen, setModalOpen] = useState(false);
-	const [gameCode, setGameCode] = useState("");
-	const [gamePublic, setGamePublic] = useState(false);
-	const [errorMsg, setErrorMsg] = useState("");
+    const [modalOpen, setModalOpen] = useState(false);
+    const [gameCode, setGameCode] = useState("");
+    const [gamePublic, setGamePublic] = useState(false);
 
-	async function handleJoinGame(event: FormEvent) {
-		event.preventDefault();
+    async function handleJoinGame(event: FormEvent) {
+        event.preventDefault();
 
-		if (!gameCode) return console.error("Code is required");
+        if (!gameCode) return console.error("Code is required");
 
-		let data: undefined | number;
-		try {
-			data = Number(gameCode);
-		} catch (error) {
-			console.error(error);
-			return;
-		}
+        let data: undefined | number;
+        try {
+            data = Number(gameCode);
+        } catch (error) {
+            console.error(error);
+            return;
+        }
 
-		let res = undefined;
-		try {
-			res = await fetch(`http://localhost:3030/api/game/join/${data}`);
-		} finally {
-			if (res && res.ok) {
-				location.href = `/online/${data}`;
-			} else {
-				setErrorMsg("Couldn't find game : " + data);
-			}
-		}
-	}
+        if (!Number.isSafeInteger(data))
+            return alert("Game code must be an number");
 
-	async function handleHostGame(event: FormEvent) {
-		event.preventDefault();
+        let res = undefined;
+        try {
+            res = await fetch(`http://localhost:3030/api/game/join/${data}`);
+        } finally {
+            if (res && res.ok) {
+                location.href = `/online/${data}`;
+            } else {
+                alert("Couldn't find game : " + data);
+            }
+        }
+    }
 
-		const body = JSON.stringify({
-			gamePublic,
-		});
+    async function handleHostGame(event: FormEvent) {
+        event.preventDefault();
 
-		let res;
+        const body = JSON.stringify({
+            gamePublic,
+        });
 
-		try {
-			res = await fetch("http://localhost:3030/api/game/host/", {
-				method: "POST",
-				headers: {
-					"Content-type": "application/json",
-				},
-				body,
-			});
-		} catch (error) {
-			console.error(error);
-			return;
-		}
+        let res;
 
-		let data: undefined | { code: number };
+        try {
+            res = await fetch("http://localhost:3030/api/game/host/", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body,
+            });
+        } catch (error) {
+            console.error(error);
+            return;
+        }
 
-		try {
-			data = (await res.json()) as { code: number };
-		} catch (error) {
-			console.error(error);
-		}
+        let data: undefined | { code: number };
 
-		if (!data) return setErrorMsg("Couldnt't host game");
+        try {
+            data = (await res.json()) as { code: number };
+        } catch (error) {
+            console.error(error);
+        }
 
-		location.href = `/online/${data.code}`;
-	}
+        if (!data) return alert("Couldnt't host game");
 
-	async function handleFindGame() {
-		let res;
+        location.href = `/online/${data.code}`;
+    }
 
-		try {
-			res = await fetch("http://localhost:3030/api/game/find");
-		} catch (error) {
-			console.error(error);
-			return;
-		}
+    async function handleFindGame() {
+        let res;
 
-		let data: undefined | { code: number };
+        try {
+            res = await fetch("http://localhost:3030/api/game/find");
+        } catch (error) {
+            console.error(error);
+            return;
+        }
 
-		try {
-			data = await res.json();
-		} catch (error) {
-			return console.error(error);
-		}
+        let data: undefined | { code: number };
 
-		if (!data) return setErrorMsg("Coudn't get server data");
-		if (!data.code) return setErrorMsg("Coudn't find game");
+        try {
+            data = await res.json();
+        } catch (error) {
+            return console.error(error);
+        }
 
-		location.href = `/online/${data.code}`;
-	}
+        if (!data) return alert("Coudn't get server data");
+        if (!data.code) return alert("Coudn't find game");
 
-	return (
-		<>
-			<main className={styles.main}>
-				<h1>Connect4</h1>
-				<div className={styles.menu}>
-					<div>
-						<Link href="/ai">
-							<CustomButton>Play with AI</CustomButton>
-						</Link>
-					</div>
-					<div
-						onClick={() => {
-							setModalOpen(true);
-						}}
-					>
-						<CustomButton>Play online</CustomButton>
-					</div>
-					<div>
-						<Link href="/local">
-							<CustomButton>Play locally</CustomButton>
-						</Link>
-					</div>
-				</div>
-			</main>
+        location.href = `/online/${data.code}`;
+    }
 
-			<CustomModal open={modalOpen}>
-				<header className={styles.modalHeader}>
-					<button
-						onClick={() => setModalOpen(false)}
-						className={styles.modalBtn}
-					>
-						x
-					</button>
+    return (
+        <>
+            <main className={styles.main}>
+                <h1>Connect4</h1>
+                <div className={styles.menu}>
+                    <div>
+                        <Link href="/ai">
+                            <CustomButton>Play with AI</CustomButton>
+                        </Link>
+                    </div>
+                    <div
+                        onClick={() => {
+                            setModalOpen(true);
+                        }}
+                    >
+                        <CustomButton>Play online</CustomButton>
+                    </div>
+                    <div>
+                        <Link href="/local">
+                            <CustomButton>Play locally</CustomButton>
+                        </Link>
+                    </div>
+                </div>
+            </main>
 
-					<h2>Play online games</h2>
-				</header>
+            <CustomModal open={modalOpen}>
+                <header className={styles.modalHeader}>
+                    <button
+                        onClick={() => setModalOpen(false)}
+                        className={styles.modalBtn}
+                    >
+                        x
+                    </button>
 
-				<form className={styles.modalForm} onSubmit={(e) => handleJoinGame(e)}>
-					<p>Join game</p>
-					<input
-						type="text"
-						name="gameCode"
-						placeholder="Game code..."
-						required
-						value={gameCode}
-						onChange={(event) => {
-							setGameCode(event.target.value);
-						}}
-					/>
-					<CustomButton>Join</CustomButton>
-				</form>
+                    <h2>Play online games</h2>
+                </header>
 
-				<form className={styles.modalForm} onSubmit={(e) => handleHostGame(e)}>
-					<p>Host game</p>
-					<div className={styles.customCheckbox}>
-						<input
-							type="checkbox"
-							name="publicGame"
-							id="publicGame"
-							checked={gamePublic}
-							onChange={(e) => setGamePublic(!gamePublic)}
-						/>
-						<label htmlFor="publicGame">Public game</label>
-					</div>
-					<CustomButton>Host game</CustomButton>
-				</form>
+                <form
+                    className={styles.modalForm}
+                    onSubmit={(e) => handleJoinGame(e)}
+                >
+                    <p>Join game</p>
+                    <input
+                        type="text"
+                        name="gameCode"
+                        placeholder="Game code..."
+                        required
+                        value={gameCode}
+                        onChange={(event) => {
+                            setGameCode(event.target.value);
+                        }}
+                    />
+                    <CustomButton>Join</CustomButton>
+                </form>
 
-				<div onClick={handleFindGame}>
-					<CustomButton>Find quick game</CustomButton>
-				</div>
+                <form
+                    className={styles.modalForm}
+                    onSubmit={(e) => handleHostGame(e)}
+                >
+                    <p>Host game</p>
+                    <div className={styles.customCheckbox}>
+                        <input
+                            type="checkbox"
+                            name="publicGame"
+                            id="publicGame"
+                            checked={gamePublic}
+                            onChange={(e) => setGamePublic(!gamePublic)}
+                        />
+                        <label htmlFor="publicGame">Public game</label>
+                    </div>
+                    <CustomButton>Host game</CustomButton>
+                </form>
 
-				<div className={styles.errorMsg}>{errorMsg}</div>
-			</CustomModal>
-			<CustomFooter></CustomFooter>
-		</>
-	);
+                <div onClick={handleFindGame}>
+                    <CustomButton>Find quick game</CustomButton>
+                </div>
+            </CustomModal>
+            <CustomFooter></CustomFooter>
+        </>
+    );
 }
