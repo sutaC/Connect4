@@ -45,7 +45,7 @@ export default function Page() {
         if (wsControllRef.current) return;
 
         try {
-            const socket = new WebSocket("ws://localhost:3040");
+            const socket = new WebSocket("ws://147.135.210.100:4040");
             wsControllRef.current = new WsControll(socket, gameCode);
             wsControllRef.current.onWsAutentication = handleWsAthentication;
             wsControllRef.current.onBoardUpdate = handleBoardUpdate;

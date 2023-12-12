@@ -29,7 +29,9 @@ export default function Home() {
 
         let res = undefined;
         try {
-            res = await fetch(`http://localhost:3030/api/game/join/${data}`);
+            res = await fetch(
+                `http://147.135.210.100:4030/api/game/join/${data}`
+            );
         } finally {
             if (res && res.ok) {
                 location.href = `/online/${data}`;
@@ -49,7 +51,7 @@ export default function Home() {
         let res;
 
         try {
-            res = await fetch("http://localhost:3030/api/game/host/", {
+            res = await fetch("http://147.135.210.100:4030/api/game/host/", {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json",
@@ -78,7 +80,7 @@ export default function Home() {
         let res;
 
         try {
-            res = await fetch("http://localhost:3030/api/game/find");
+            res = await fetch("http://147.135.210.100:4030/api/game/find");
         } catch (error) {
             console.error(error);
             return;
