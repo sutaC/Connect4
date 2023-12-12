@@ -7,9 +7,11 @@ Connect4 is a project aimed at implementing the classic game of the same name us
 -   Next.js (14)
 -   Typescript
 -   CSS Modules
+-   Express.js
 -   MongoDB
--   Web Sockets
+-   Web Sockets (ws)
 -   PWA
+-   Docker
 
 ## How to start app?
 

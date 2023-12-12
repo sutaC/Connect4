@@ -46,3 +46,14 @@
 .opacity dialog::backdrop {
     opacity: 0.5;
 }
+
+.playerMsg {
+    padding-top: 0.5em;
+
+    text-align: center;
+    color: var(--accent);
+}
+
+.playerMsg:empty {
+    display: none;
+}

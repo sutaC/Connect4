@@ -5,13 +5,19 @@ export default function CustomButton({
 	type = "Primary",
 }: {
 	children?: React.ReactNode;
-	type?: "Primary" | "Secondary";
+	type?: "Primary" | "Secondary" | "Accent";
 }) {
 	return (
 		<button
-			type='submit'
+			type="submit"
 			className={`${styles.customButton} ${
-				type === "Secondary" ? styles.secondary : styles.primary
+				type === "Primary"
+					? styles.primary
+					: type === "Secondary"
+					? styles.secondary
+					: type === "Accent"
+					? styles.accent
+					: ""
 			}`}
 		>
 			{children}
