@@ -15,16 +15,8 @@ Connect4 is a project aimed at implementing the classic game of the same name us
 
 ## How to start app?
 
-1. Install all dependencies by - `npm install`
+1. Have installed docker and docker-compose on your machine
 
-1. Add enviroment file in root directory
+1. If necessary change application configuration in [docker-compose.yml](/docker-compose.yml) file (*Application in **dev** branch is configured for develompent purposes and **main** branch is configured for official production deployment*)
 
-    ```.env
-        ???=???
-        ???=???
-        ???=???
-    ```
-
-1. Activate MongoDB database (_if using locally_)
-
-1. Run project in development / production mode by - `npm run dev` or `npm run start`
+1. In root directory run `docker-compose up` 
