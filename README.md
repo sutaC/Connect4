@@ -1,6 +1,6 @@
 # Connect4 Project
 
-Connect4 is a project aimed at implementing the classic game of the same name using web technologies. The application is intended to enable gameplay in three modes, both locally and over the network. Additionally, the application will be adapted to function as a native app using Progressive Web App (PWA) technology.
+Connect4 is a project aimed at implementing the classic game of the same name using web technologies. The application is intended to enable gameplay in three modes, both locally and over the network. ~~Additionally, the application will be adapted to function as a native app using Progressive Web App (PWA) technology.~~
 
 ## Used technologies
 
@@ -10,7 +10,7 @@ Connect4 is a project aimed at implementing the classic game of the same name us
 -   Express.js
 -   MongoDB
 -   Web Sockets (ws)
--   PWA
+-   ~~PWA~~
 -   Docker
 
 ## How to start app?
