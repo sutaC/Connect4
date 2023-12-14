@@ -30,7 +30,7 @@ export default function Home() {
         let res = undefined;
         try {
             res = await fetch(
-                `https://connect4.sutac.pl/server/api/game/join/${data}`
+                `https://connect4.sutac.pl/api/game/join/${data}`
             );
         } finally {
             if (res && res.ok) {
@@ -51,16 +51,13 @@ export default function Home() {
         let res;
 
         try {
-            res = await fetch(
-                "https://connect4.sutac.pl/server/api/game/host/",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-type": "application/json",
-                    },
-                    body,
-                }
-            );
+            res = await fetch("https://connect4.sutac.pl/api/game/host/", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body,
+            });
         } catch (error) {
             console.error(error);
             return;
@@ -83,7 +80,7 @@ export default function Home() {
         let res;
 
         try {
-            res = await fetch("https://connect4.sutac.pl/server/api/game/find");
+            res = await fetch("https://connect4.sutac.pl/api/game/find");
         } catch (error) {
             console.error(error);
             return;
