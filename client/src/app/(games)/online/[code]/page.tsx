@@ -1,4 +1,5 @@
 "use client";
+import styles from "./page.module.css";
 import CustomFooter from "@/components/customFooter";
 import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
@@ -26,6 +27,8 @@ export default function Page() {
 
     const [gameCodeView, setGameCodeView] = useState(gameCode);
     const [errorMsg, setErrorMsg] = useState("Unknown");
+
+    const refCopied = useRef<HTMLDialogElement>(null);
 
     // --- Game init ---
 
@@ -136,6 +139,14 @@ export default function Page() {
         setModalErrorOpen(true);
     }
 
+    function handleCodeCopy() {
+        navigator.clipboard.writeText(
+            `Hey, join and play Connect4 with me! You can connect with me at this link:\n${location.href}\nor just entering my gamecode ${gameCodeView} in connect4.sutac.pl`
+        );
+        refCopied.current?.show();
+        setTimeout(() => refCopied.current?.close(), 1350);
+    }
+
     // --- Render ---
     return (
         <>
@@ -150,7 +161,12 @@ export default function Page() {
                 <h2>Waiting for other player...</h2>
                 <div>
                     <small>Game code:</small>
-                    <p className="highlight">{gameCodeView ?? ""}</p>
+                    <dialog ref={refCopied} className={styles.popup}>
+                        Link copied!
+                    </dialog>
+                    <p className="highlight" onClick={handleCodeCopy}>
+                        {gameCodeView ?? ""}
+                    </p>
                 </div>
                 <div onClick={handleExit}>
                     <CustomButton>Exit</CustomButton>
