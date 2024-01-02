@@ -4,7 +4,7 @@ import CustomButton from "@/components/customButton";
 import CustomModal from "@/components/customModal";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function Home() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -97,6 +97,22 @@ export default function Home() {
 
         location.href = `/online/${data.code}`;
     }
+
+    // SW
+    useEffect(() => {
+        if ("serviceWorker" in navigator) {
+            console.log("Registering service worker");
+            try {
+                navigator.serviceWorker.register("/sw.js");
+            } catch (error) {
+                console.error("Registering service worker failed: " + error);
+            }
+        } else {
+            console.warn("Service worker could not been registerd");
+        }
+    }, []);
+
+    // App
 
     return (
         <>
