@@ -8,13 +8,13 @@ export const metadata: Metadata = {
     creator: "sutaC",
     icons: "/favicon.ico",
     keywords:
-        "connect4 game multiplayer singleplayer play board connectfour connect webgame htmlgame online gameonline",
+        "connect4, game, multiplayer, singleplayer, play, board, connectfour, connect 4, webgame, htmlgame, online, gameonline,",
     openGraph: {
-        images: "/icon-128x128.png",
+        images: "https://connect4.sutac.pl/icon-128x128.png",
         type: "website",
         description: "Simple and classic Connect 4 game for anyone to enjoy!",
         siteName: "Connect4",
-        url: "connect4.sutac.pl",
+        url: "https://connect4.sutac.pl",
     },
 };
 

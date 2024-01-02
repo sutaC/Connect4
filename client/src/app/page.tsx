@@ -4,12 +4,14 @@ import CustomButton from "@/components/customButton";
 import CustomModal from "@/components/customModal";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function Home() {
     const [modalOpen, setModalOpen] = useState(false);
     const [gameCode, setGameCode] = useState("");
     const [gamePublic, setGamePublic] = useState(false);
+
+    const [online, setOnline] = useState(true);
 
     async function handleJoinGame(event: FormEvent) {
         event.preventDefault();
@@ -100,6 +102,37 @@ export default function Home() {
         location.href = `/online/${data.code}`;
     }
 
+    // SW
+    useEffect(() => {
+        if ("serviceWorker" in navigator) {
+            console.log("Registering service worker");
+            try {
+                navigator.serviceWorker.register("/sw.js");
+            } catch (error) {
+                console.error("Registering service worker faild: " + error);
+            }
+        } else {
+            console.warn("Service worker could not been registerd");
+        }
+    }, []);
+
+    // Offline mode
+
+    useEffect(() => {
+        setOnline(navigator.onLine);
+
+        window.addEventListener("online", () => {
+            setOnline(true);
+        });
+
+        window.addEventListener("offline", () => {
+            setOnline(false);
+            setModalOpen(false);
+        });
+    }, []);
+
+    // App
+
     return (
         <>
             <main className={styles.main}>
@@ -115,7 +148,9 @@ export default function Home() {
                             setModalOpen(true);
                         }}
                     >
-                        <CustomButton>Play online</CustomButton>
+                        <CustomButton disabled={!online}>
+                            Play online
+                        </CustomButton>
                     </div>
                     <div>
                         <Link href="/local">
@@ -177,7 +212,7 @@ export default function Home() {
                     <CustomButton>Find quick game</CustomButton>
                 </div>
             </CustomModal>
-            <CustomFooter></CustomFooter>
+            <CustomFooter>{online ? "" : "Offline"}</CustomFooter>
         </>
     );
 }
