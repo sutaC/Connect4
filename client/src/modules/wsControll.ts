@@ -86,7 +86,7 @@ export default class WsControll {
         if (wsEvent.event !== "userAuth") {
             if (!this.authenticated) {
                 return console.warn(
-                    "User was not authenticated but recived: ",
+                    "User was not authenticated but received: ",
                     wsEvent
                 );
             }
