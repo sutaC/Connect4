@@ -11,6 +11,8 @@ export default function Home() {
     const [gameCode, setGameCode] = useState("");
     const [gamePublic, setGamePublic] = useState(false);
 
+    const [online, setOnline] = useState(true);
+
     async function handleJoinGame(event: FormEvent) {
         event.preventDefault();
 
@@ -105,11 +107,26 @@ export default function Home() {
             try {
                 navigator.serviceWorker.register("/sw.js");
             } catch (error) {
-                console.error("Registering service worker failed: " + error);
+                console.error("Registering service worker faild: " + error);
             }
         } else {
             console.warn("Service worker could not been registerd");
         }
+    }, []);
+
+    // Offline mode
+
+    useEffect(() => {
+        setOnline(navigator.onLine);
+
+        window.addEventListener("online", () => {
+            setOnline(true);
+        });
+
+        window.addEventListener("offline", () => {
+            setOnline(false);
+            setModalOpen(false);
+        });
     }, []);
 
     // App
@@ -129,7 +146,9 @@ export default function Home() {
                             setModalOpen(true);
                         }}
                     >
-                        <CustomButton>Play online</CustomButton>
+                        <CustomButton disabled={!online}>
+                            Play online
+                        </CustomButton>
                     </div>
                     <div>
                         <Link href="/local">
@@ -191,7 +210,7 @@ export default function Home() {
                     <CustomButton>Find quick game</CustomButton>
                 </div>
             </CustomModal>
-            <CustomFooter></CustomFooter>
+            <CustomFooter>{online ? "" : "Offline"}</CustomFooter>
         </>
     );
 }
