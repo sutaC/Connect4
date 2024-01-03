@@ -164,7 +164,7 @@ export default function Home() {
                         onClick={() => setModalOpen(false)}
                         className={styles.modalBtn}
                     >
-                        x
+                        &times;
                     </button>
 
                     <h2>Play online games</h2>

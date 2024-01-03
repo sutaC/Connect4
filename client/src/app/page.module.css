@@ -73,6 +73,8 @@
     box-shadow: 0 4px 4px #00000088;
 
     background-color: var(--primary);
+    color: transparent;
+    transition: color 0.25s ease;
 }
 
 .customCheckbox > input:hover:after,
