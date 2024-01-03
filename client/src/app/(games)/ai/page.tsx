@@ -1,4 +1,5 @@
 "use client";
+import stylesBoard from "@/components/board.module.css";
 import { useEffect, useState } from "react";
 import GamePage from "../game";
 import CustomFooter from "@/components/customFooter";
@@ -72,12 +73,14 @@ export default function Page() {
 
     return (
         <>
-            <GamePage
-                board={boardView}
-                turnMsg={`${turnMsg} turn!`}
-                handleNewGame={handleNewGame}
-                handleExit={handleExit}
-            ></GamePage>
+            <div className={stylesBoard.aiGame}>
+                <GamePage
+                    board={boardView}
+                    turnMsg={`${turnMsg} turn!`}
+                    handleNewGame={handleNewGame}
+                    handleExit={handleExit}
+                ></GamePage>
+            </div>
             <CustomFooter>Singleplayer with AI</CustomFooter>
         </>
     );

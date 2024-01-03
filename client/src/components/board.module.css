@@ -72,3 +72,23 @@
     background: yellow;
     color: yellow;
 }
+
+/* AI movement */
+
+@keyframes await {
+    from {
+        background: var(--secondary);
+    }
+    to {
+        opacity: 0.7;
+        background: var(--secondary);
+    }
+}
+
+.aiGame {
+    position: auto;
+}
+
+.aiGame .cell.yellow {
+    animation: await 0.5s linear, cellDrop 0.7s ease-out 0.5s;
+}
