@@ -8,14 +8,14 @@
     text-align: center;
 }
 
-.customFooter>p {
+.customFooter > p {
     margin-bottom: 1rem;
 }
 
 .author {
-    color: var(--accent);
+    color: color-mix(in srgb, var(--accent) 100%, var(--text) 15%);
 }
 
-.author>a {
-    color: var(--accent);
+.author > a {
+    color: currentColor;
 }
