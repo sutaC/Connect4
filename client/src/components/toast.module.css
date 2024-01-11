@@ -1,0 +1,26 @@
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        translate: 0 0;
+    }
+    100% {
+        opacity: 1;
+        translate: 0 -110%;
+    }
+}
+
+.popup {
+    translate: 0 -110%;
+    padding: 0.5em;
+
+    z-index: 100;
+
+    border: none;
+    border-radius: 0.25rem;
+
+    background-color: var(--accent);
+    font-size: 0.8rem;
+    color: var(--text);
+
+    animation: slideIn 0.3s ease;
+}

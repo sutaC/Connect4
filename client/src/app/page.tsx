@@ -4,7 +4,8 @@ import CustomButton from "@/components/customButton";
 import CustomModal from "@/components/customModal";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, SetStateAction, useEffect, useState } from "react";
+import Toast from "@/components/toast";
 
 export default function Home() {
     const [modalOpen, setModalOpen] = useState(false);
@@ -13,10 +14,23 @@ export default function Home() {
 
     const [online, setOnline] = useState(true);
 
+    const [codeError, setCodeError] = useState("");
+    const [hostError, setHostError] = useState("");
+    const [findError, setFindError] = useState("");
+
+    function toastError(
+        error: string,
+        seter: (value: SetStateAction<string>) => any
+    ): void {
+        seter("");
+        seter(error);
+        setTimeout(() => seter(""), 1350);
+    }
+
     async function handleJoinGame(event: FormEvent) {
         event.preventDefault();
 
-        if (!gameCode) return console.error("Code is required");
+        if (!gameCode) return toastError("Code is required", setCodeError);
 
         let data: undefined | number;
         try {
@@ -27,7 +41,7 @@ export default function Home() {
         }
 
         if (!Number.isSafeInteger(data))
-            return alert("Game code must be an number");
+            return toastError("Game code must be an number", setCodeError);
 
         let res = undefined;
         try {
@@ -38,7 +52,7 @@ export default function Home() {
             if (res && res.ok) {
                 location.href = `/online/${data}`;
             } else {
-                alert("Couldn't find game : " + data);
+                return toastError(`Couldn't find game : ${data}`, setCodeError);
             }
         }
     }
@@ -73,7 +87,7 @@ export default function Home() {
             console.error(error);
         }
 
-        if (!data) return alert("Couldnt't host game");
+        if (!data) return toastError("Couldnt't host game", setHostError);
 
         location.href = `/online/${data.code}`;
     }
@@ -96,8 +110,8 @@ export default function Home() {
             return console.error(error);
         }
 
-        if (!data) return alert("Coudn't get server data");
-        if (!data.code) return alert("Coudn't find game");
+        if (!data) return toastError("Coudn't get server data", setFindError);
+        if (!data.code) return toastError("Coudn't find game", setFindError);
 
         location.href = `/online/${data.code}`;
     }
@@ -177,11 +191,12 @@ export default function Home() {
                     onSubmit={(e) => handleJoinGame(e)}
                 >
                     <p>Join game</p>
+                    <Toast open={!!codeError}>{codeError}</Toast>
                     <input
                         type="text"
                         name="gameCode"
                         placeholder="Game code..."
-                        required
+                        autoComplete="off"
                         value={gameCode}
                         onChange={(event) => {
                             setGameCode(event.target.value);
@@ -195,21 +210,25 @@ export default function Home() {
                     onSubmit={(e) => handleHostGame(e)}
                 >
                     <p>Host game</p>
+                    <Toast open={!!hostError}>{hostError}</Toast>
                     <div className={styles.customCheckbox}>
                         <input
                             type="checkbox"
                             name="publicGame"
                             id="publicGame"
                             checked={gamePublic}
-                            onChange={(e) => setGamePublic(!gamePublic)}
+                            onChange={() => setGamePublic(!gamePublic)}
                         />
                         <label htmlFor="publicGame">Public game</label>
                     </div>
                     <CustomButton>Host game</CustomButton>
                 </form>
 
-                <div onClick={handleFindGame}>
-                    <CustomButton>Find quick game</CustomButton>
+                <div>
+                    <Toast open={!!findError}>{findError}</Toast>
+                    <div onClick={handleFindGame}>
+                        <CustomButton>Find quick game</CustomButton>
+                    </div>
                 </div>
             </CustomModal>
             <CustomFooter>{online ? "" : "Offline"}</CustomFooter>

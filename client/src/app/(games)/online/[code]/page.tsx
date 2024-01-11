@@ -1,8 +1,8 @@
 "use client";
-import styles from "./page.module.css";
 import CustomFooter from "@/components/customFooter";
 import CustomModal from "@/components/customModal";
 import CustomButton from "@/components/customButton";
+import Toast from "@/components/toast";
 import WsControll from "@/modules/wsControll";
 import GamePage, { GameOverEvent } from "../../game";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
@@ -28,7 +28,7 @@ export default function Page() {
     const [gameCodeView, setGameCodeView] = useState(gameCode);
     const [errorMsg, setErrorMsg] = useState("Unknown");
 
-    const refCopied = useRef<HTMLDialogElement>(null);
+    const [toastCode, setToastCode] = useState(false);
 
     // --- Game init ---
 
@@ -91,7 +91,6 @@ export default function Page() {
 
     function handleNewGame() {
         wsControllRef.current?.sendNewGameEvent();
-
         setModalWaitingOpen(true);
     }
 
@@ -141,10 +140,10 @@ export default function Page() {
 
     function handleCodeCopy() {
         navigator.clipboard.writeText(
-            `Hey, join and play Connect4 with me! You can connect with me at this link:\n${location.href}\nor just entering my gamecode ${gameCodeView} in connect4.sutac.pl`
+            `Hey, join and play Connect4 with me! You can connect with me at this link:\n${location.href}`
         );
-        refCopied.current?.show();
-        setTimeout(() => refCopied.current?.close(), 1350);
+        setToastCode(true);
+        setTimeout(() => setToastCode(false), 1350);
     }
 
     // --- Render ---
@@ -161,9 +160,7 @@ export default function Page() {
                 <h2>Waiting for other player...</h2>
                 <div>
                     <small>Game code:</small>
-                    <dialog ref={refCopied} className={styles.popup}>
-                        Link copied!
-                    </dialog>
+                    <Toast open={toastCode}>Link copied!</Toast>
                     <p className="highlight" onClick={handleCodeCopy}>
                         {gameCodeView ?? ""}
                     </p>
