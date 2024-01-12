@@ -138,7 +138,28 @@ export default function Page() {
         setModalErrorOpen(true);
     }
 
-    function handleCodeCopy() {
+    async function handleCodeCopy() {
+        const shared = {
+            url: location.href,
+            text: "Hey, join and play Connect4 with me! You can connect with me at this link:",
+            title: "Connect4 game invite",
+        };
+        if (navigator.canShare(shared)) {
+            try {
+                await navigator.share(shared);
+                return;
+            } catch (error) {
+                console.error(
+                    `Couldn't share using share API, becouse error ocurred: ${error}`
+                );
+            }
+        } else {
+            console.warn(
+                "Could not use share API, becouse browser/system doesn't support it."
+            );
+        }
+
+        // Link copy backup
         navigator.clipboard.writeText(
             `Hey, join and play Connect4 with me! You can connect with me at this link:\n${location.href}`
         );
