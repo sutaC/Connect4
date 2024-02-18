@@ -71,6 +71,7 @@ body:has(.modalWrapper) {
         var(--_transition-duration) ease-out;
 }
 .modalWrapper dialog::backdrop {
+    opacity: 1;
     transition: opacity var(--_transition-duration) ease-out;
 }
 .modalWrapper .modalBtn {
