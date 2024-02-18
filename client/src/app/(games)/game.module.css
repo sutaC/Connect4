@@ -42,8 +42,8 @@
     text-decoration: underline;
 }
 
-.opacity dialog,
-.opacity dialog::backdrop {
+.modalBtn:focus {
+    outline: none;
     opacity: 0.5;
 }
 
@@ -56,4 +56,37 @@
 
 .playerMsg:empty {
     display: none;
+}
+
+.modalWrapper {
+    --_transition-duration: 250ms;
+}
+
+body:has(.modalWrapper) {
+    overflow: hidden;
+}
+
+.modalWrapper dialog {
+    transition: top var(--_transition-duration) ease-out,
+        var(--_transition-duration) ease-out;
+}
+.modalWrapper dialog::backdrop {
+    transition: opacity var(--_transition-duration) ease-out;
+}
+.modalWrapper .modalBtn {
+    transition: rotate var(--_transition-duration) ease-in-out 50ms;
+}
+
+.modalWrapper.gameView dialog::backdrop {
+    opacity: 0.25;
+}
+
+.modalWrapper.gameView dialog {
+    position: absolute;
+    top: 100%;
+    translate: 0 33%;
+}
+
+.modalWrapper.gameView .modalBtn {
+    rotate: 180deg;
 }
