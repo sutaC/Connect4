@@ -22,7 +22,7 @@ export default function GamePage({
     handleExit?: () => any;
 }) {
     const [modalOpen, setModalOpen] = useState(false);
-    const [modalOpacity, setModalOpacity] = useState(false);
+    const [modalGameView, setModalGameView] = useState(false);
     const [endMsg, setEndMsg] = useState("");
 
     function gameEnd(event: GameOverEvent) {
@@ -50,16 +50,20 @@ export default function GamePage({
 
             <Board board={board}></Board>
 
-            <div className={modalOpacity ? styles.opacity : ""}>
+            <div
+                className={`${styles.modalWrapper} ${
+                    modalGameView ? styles.gameView : ""
+                }`}
+            >
                 <CustomModal open={modalOpen}>
                     <header className={styles.modalHeader}>
                         <button
                             onClick={() => {
-                                setModalOpacity(!modalOpacity);
+                                setModalGameView(!modalGameView);
                             }}
                             className={styles.modalBtn}
                         >
-                            &times;
+                            &#11206;
                         </button>
 
                         <h2>Game finished</h2>
