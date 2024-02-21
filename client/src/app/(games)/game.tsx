@@ -63,7 +63,9 @@ export default function GamePage({
                             }}
                             className={styles.modalBtn}
                         >
-                            &#11206;
+                            <i
+                                className={`${styles.icon} ${styles.iconArrowDown}`}
+                            ></i>
                         </button>
 
                         <h2>Game finished</h2>
