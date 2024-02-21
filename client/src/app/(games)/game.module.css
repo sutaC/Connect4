@@ -42,8 +42,15 @@
     text-decoration: underline;
 }
 
+.modalBtn:hover {
+    opacity: 0.75;
+}
+
 .modalBtn:focus {
     outline: none;
+}
+
+.modalBtn:active {
     opacity: 0.5;
 }
 
@@ -68,9 +75,11 @@ body:has(.modalWrapper) {
 
 .modalWrapper dialog {
     transition: top var(--_transition-duration) ease-out,
-        var(--_transition-duration) ease-out;
+        translate var(--_transition-duration) ease-out,
+        opacity var(--_transition-duration) ease-out;
 }
 .modalWrapper dialog::backdrop {
+    opacity: 1;
     transition: opacity var(--_transition-duration) ease-out;
 }
 .modalWrapper .modalBtn {
@@ -89,4 +98,21 @@ body:has(.modalWrapper) {
 
 .modalWrapper.gameView .modalBtn {
     rotate: 180deg;
+}
+
+.icon {
+    --_icon: url(""); /* Override */
+
+    mask-image: var(--_icon);
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    background-color: var(--accent);
+
+    display: block;
+    width: 2rem;
+    aspect-ratio: 1;
+}
+
+.iconArrowDown {
+    --_icon: url("/images/icon-arrow-down.svg");
 }
