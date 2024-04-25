@@ -45,7 +45,9 @@ export default function Home() {
 
         let res = undefined;
         try {
-            res = await fetch(`http://localhost:3030/api/game/join/${data}`);
+            res = await fetch(
+                `https://connect4.sutac.pl/api/game/join/${data}`
+            );
         } finally {
             if (res && res.ok) {
                 location.href = `/online/${data}`;
@@ -65,7 +67,7 @@ export default function Home() {
         let res;
 
         try {
-            res = await fetch("http://localhost:3030/api/game/host/", {
+            res = await fetch("https://connect4.sutac.pl/api/game/host/", {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json",
@@ -94,7 +96,7 @@ export default function Home() {
         let res;
 
         try {
-            res = await fetch("http://localhost:3030/api/game/find");
+            res = await fetch("https://connect4.sutac.pl/api/game/find");
         } catch (error) {
             console.error(error);
             return;

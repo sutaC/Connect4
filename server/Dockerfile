@@ -8,8 +8,4 @@ RUN npm i
 
 COPY . .
 
-EXPOSE 3030
-
-EXPOSE 3040
-
-CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "start" ]

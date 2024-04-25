@@ -48,7 +48,7 @@ export default function Page() {
         if (wsControllRef.current) return;
 
         try {
-            const socket = new WebSocket("ws://localhost:3040");
+            const socket = new WebSocket("wss://connect4.sutac.pl/server/ws");
             wsControllRef.current = new WsControll(socket, gameCode);
             wsControllRef.current.onWsAutentication = handleWsAthentication;
             wsControllRef.current.onBoardUpdate = handleBoardUpdate;
