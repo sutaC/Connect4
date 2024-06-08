@@ -16,6 +16,7 @@ export default function Page() {
     let player: Player = null;
     let board: Player[][] = getEmptyBoard();
     let turn: Player = null;
+    let processing = false;
 
     const [playerMsg, setPlayerMsg] = useState<Player>(null);
 
@@ -71,10 +72,13 @@ export default function Page() {
 
     function handleBoardClick(event: BoardClickEvent) {
         if (player !== turn || !player) return;
+        if (processing) return;
 
         const { row } = event.detail;
 
         if (!isMovePlayable(board, row)) return;
+
+        processing = true;
 
         wsControllRef.current?.sendPlayerMoveEvent(row);
     }
@@ -92,6 +96,7 @@ export default function Page() {
     function handleNewGame() {
         wsControllRef.current?.sendNewGameEvent();
         setModalWaitingOpen(true);
+        processing = false;
     }
 
     function handleWsAthentication(color: Player) {
@@ -102,6 +107,7 @@ export default function Page() {
 
     function handleBoardUpdate(newBoard: Player[][], newTurn: Player) {
         if (modalWaitingOpen) setModalWaitingOpen(false);
+        processing = false;
 
         board = newBoard;
         setBoardView(board);
