@@ -1,7 +1,17 @@
 services:
+    client:
+        command: ["npm", "run", "dev"]
+        user: "${UID}:${GID}"
+        volumes:
+            - /app/node_modules/
+            - /app/.next/
+            - ./client:/app
+        environment:
+            - NODE_ENV=development
     server:
         command: ["npx", "tsx", "watch", "/app/src/app.ts"]
         volumes:
+            - /app/node_modules/
             - ./server:/app
         environment:
             - NODE_ENV=development

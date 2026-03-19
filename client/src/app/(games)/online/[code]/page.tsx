@@ -49,7 +49,9 @@ export default function Page() {
         if (wsControllRef.current) return;
 
         try {
-            const socket = new WebSocket("wss://connect4.sutac.pl/server/ws");
+            const socket = new WebSocket(
+                `${process.env.NEXT_PUBLIC_WS_URL ?? ""}/server/ws`,
+            );
             wsControllRef.current = new WsControll(socket, gameCode);
             wsControllRef.current.onWsAutentication = handleWsAthentication;
             wsControllRef.current.onBoardUpdate = handleBoardUpdate;
@@ -86,7 +88,7 @@ export default function Page() {
     function handleExit() {
         if (
             confirm(
-                "Are you sure you want to exit game? It will be lost forever!"
+                "Are you sure you want to exit game? It will be lost forever!",
             )
         ) {
             location.href = "/";
@@ -156,18 +158,18 @@ export default function Page() {
                 return;
             } catch (error) {
                 console.error(
-                    `Couldn't share using share API, becouse error ocurred: ${error}`
+                    `Couldn't share using share API, becouse error ocurred: ${error}`,
                 );
             }
         } else {
             console.warn(
-                "Could not use share API, becouse browser/system doesn't support it."
+                "Could not use share API, becouse browser/system doesn't support it.",
             );
         }
 
         // Link copy backup
         navigator.clipboard.writeText(
-            `Hey, join and play Connect4 with me! You can connect with me at this link:\n${location.href}`
+            `Hey, join and play Connect4 with me! You can connect with me at this link:\n${location.href}`,
         );
         setToastCode(true);
         setTimeout(() => setToastCode(false), 1350);

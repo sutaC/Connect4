@@ -3,8 +3,6 @@ FROM node:24-slim AS builder
 
 WORKDIR /app
 
-RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
-
 COPY package*.json .
 RUN npm install
 
@@ -17,8 +15,6 @@ FROM node:24-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
-
 COPY package*.json .
 RUN npm install --omit=dev
 
@@ -26,8 +22,7 @@ COPY --from=builder /app/dist ./dist
 
 ENV NODE_ENV=production
 
-RUN useradd -m appuser \
-    && chown -R appuser:appuser /app
+RUN useradd -m appuser && chown -R appuser:appuser /app
 
 USER appuser
 

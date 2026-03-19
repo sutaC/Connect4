@@ -1,3 +1,6 @@
+# Dirs
 node_modules/
 dist/
+# Files
 *.env*
+*.md

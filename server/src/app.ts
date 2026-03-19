@@ -21,13 +21,18 @@ app.use(router);
 // WS
 
 const wss = new WebSocketServer({ port: wsport });
+
+wss.once("listening", () => {
+    console.log(`Listening on: ws://localhost:${wsport}`);
+});
+
 const wsService = new WsService(wss);
 
 // DB
 
 configDbCleaner();
 
-// Listen
+// HTTP
 
 app.listen(httpport, () => {
     console.log(`Listening on: http://localhost:${httpport}`);

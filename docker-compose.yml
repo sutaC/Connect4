@@ -1,14 +1,15 @@
 services:
-    # client:
-    #     build: ./client
-    #     depends_on:
-    #         - server
-    #     ports:
-    #         - 3000:3000
-    #     volumes:
-    #         - ./client:/app
-    #         - /app/node_modules
-    #         - /app/.next
+    client:
+        build: ./client
+        depends_on:
+            - server
+        env_file:
+            - .env
+        ports:
+            - 3000:3000
+        volumes:
+            - /app/node_modules/
+            - /app/.next/
     server:
         build: ./server
         depends_on:
@@ -19,7 +20,7 @@ services:
             - 3010:3010 # HTTP
             - 3020:3020 # WS
         volumes:
-            - /app/node_modules
+            - /app/node_modules/
     database:
         image: mongo:8
         command: ["mongod", "--auth"]
