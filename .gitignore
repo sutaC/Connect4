@@ -1,6 +1,8 @@
 # Dirs
+database/data/
 node_modules/
 coverage/
+dist/
 .next/
 out/
 build/
@@ -10,4 +12,3 @@ build/
 .vercel
 *.tsbuildinfo
 next-env.d.ts
-*.md

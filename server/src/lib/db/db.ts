@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import { Player, getEmptyBoard } from "../modules/game";
+import { Player, getEmptyBoard } from "../modules/game.js";
 
 // --- Init ---
 if (!process.env.MONGODB_URL) throw new Error("Could not find database url");
@@ -24,7 +24,7 @@ interface Game {
 
 export async function createGame(
     gameCode: number,
-    gamePublic: boolean
+    gamePublic: boolean,
 ): Promise<void> {
     try {
         await client.connect();
@@ -85,7 +85,7 @@ export async function findGame(gameCode: number): Promise<Game | null> {
 export async function updateGameUsers(
     gameCode: number,
     userRed: number | null,
-    userYellow: number | null
+    userYellow: number | null,
 ): Promise<void> {
     await client.connect();
     try {
@@ -96,7 +96,7 @@ export async function updateGameUsers(
                     $set: {
                         userRed,
                     },
-                }
+                },
             );
         }
         if (userYellow) {
@@ -106,7 +106,7 @@ export async function updateGameUsers(
                     $set: {
                         userYellow,
                     },
-                }
+                },
             );
         }
     } catch (error) {
@@ -118,7 +118,7 @@ export async function updateGameUsers(
 
 export async function updateGameStatus(
     gameCode: number,
-    status: GameStatus
+    status: GameStatus,
 ): Promise<void> {
     await client.connect();
     try {
@@ -128,7 +128,7 @@ export async function updateGameStatus(
                 $set: {
                     status,
                 },
-            }
+            },
         );
     } catch (error) {
         console.error(error);
@@ -139,7 +139,7 @@ export async function updateGameStatus(
 
 export async function updateGameBoard(
     gameCode: number,
-    board: Player[][]
+    board: Player[][],
 ): Promise<void> {
     await client.connect();
     try {
@@ -149,7 +149,7 @@ export async function updateGameBoard(
                 $set: {
                     board,
                 },
-            }
+            },
         );
     } catch (error) {
         console.error(error);
