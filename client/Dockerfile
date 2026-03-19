@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+RUN --mount=type=cache,target=/app/.next/cache npm run build
 
 # --- PRODUCTION STAGE --- 
 FROM node:24-slim
