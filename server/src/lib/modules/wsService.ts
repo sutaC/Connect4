@@ -1,11 +1,6 @@
 import WebSocket, { RawData, WebSocketServer } from "ws";
-import {
-    checkDraw,
-    checkGameOver,
-    getEmptyBoard,
-    playMove,
-} from "$/lib/modules/game";
-import * as db from "$/lib/db/db";
+import { checkDraw, checkGameOver, getEmptyBoard, playMove } from "./game.js";
+import * as db from "../db/db.js";
 
 // --- Types ---
 
@@ -56,7 +51,7 @@ class WsClient {
     constructor(
         private socket: WebSocket,
         private clientId: number,
-        private service: WsService
+        private service: WsService,
     ) {
         socket.on("close", async () => {
             if (!this.gameCode) return;
@@ -76,7 +71,7 @@ class WsClient {
                 this.createWsEvent("error", {
                     msg: "Opponent disconnected",
                     critical: true,
-                })
+                }),
             );
         });
 
@@ -99,7 +94,7 @@ class WsClient {
                 this.createWsEvent("error", {
                     msg: "Recived wrong event",
                     critical: true,
-                })
+                }),
             );
             this.socket.close();
             return;
@@ -111,7 +106,7 @@ class WsClient {
                 this.createWsEvent("error", {
                     msg: "Wrong game code provided",
                     critical: true,
-                })
+                }),
             );
             this.socket.close();
             return;
@@ -124,7 +119,7 @@ class WsClient {
                 this.createWsEvent("error", {
                     msg: "Game was not found",
                     critical: true,
-                })
+                }),
             );
             this.socket.close();
             return;
@@ -135,7 +130,7 @@ class WsClient {
                 this.createWsEvent("error", {
                     msg: "Game is already active",
                     critical: true,
-                })
+                }),
             );
             this.socket.close();
             return;
@@ -159,7 +154,7 @@ class WsClient {
         this.socket.send(
             this.createWsEvent("userAuth", {
                 color,
-            })
+            }),
         );
 
         this.socket.on("message", this.handlePlayerMoveEvent.bind(this));
@@ -173,7 +168,7 @@ class WsClient {
                 this.createWsEvent("error", {
                     msg: "Opponent is not avaliable",
                     critical: true,
-                })
+                }),
             );
             this.socket.close();
             return;
@@ -185,14 +180,14 @@ class WsClient {
             this.createWsEvent("boardUpdate", {
                 board: getEmptyBoard(),
                 turn: "red",
-            })
+            }),
         );
 
         oppSocket.send(
             this.createWsEvent("boardUpdate", {
                 board: getEmptyBoard(),
                 turn: "red",
-            })
+            }),
         );
     }
 
@@ -205,7 +200,7 @@ class WsClient {
             this.socket.send(
                 this.createWsEvent("error", {
                     msg: "Cannot acces gamecode on server",
-                })
+                }),
             );
             return;
         }
@@ -216,7 +211,7 @@ class WsClient {
                 this.createWsEvent("error", {
                     msg: `Cannot find game with gamecode ${this.gameCode}`,
                     critical: true,
-                })
+                }),
             );
             this.socket.close();
             return;
@@ -224,14 +219,14 @@ class WsClient {
 
         const player = game.userRed === this.clientId ? "red" : "yellow";
         const opponent = this.service.findClient(
-            (player === "red" ? game.userYellow : game.userRed) as number
+            (player === "red" ? game.userYellow : game.userRed) as number,
         );
         if (!opponent) {
             this.socket.send(
                 this.createWsEvent("error", {
                     msg: "Opponent is not avaliable",
                     critical: true,
-                })
+                }),
             );
             this.socket.close();
             return;
@@ -242,7 +237,7 @@ class WsClient {
             this.socket.send(
                 this.createWsEvent("error", {
                     msg: "Player cannot play that move",
-                })
+                }),
             );
             return;
         }
@@ -286,7 +281,7 @@ class WsClient {
             this.socket.send(
                 this.createWsEvent("error", {
                     msg: "Cannot acces gamecode on server",
-                })
+                }),
             );
             return;
         }
@@ -297,7 +292,7 @@ class WsClient {
                 this.createWsEvent("error", {
                     msg: `Cannot find game with gamecode ${this.gameCode}`,
                     critical: true,
-                })
+                }),
             );
             this.socket.close();
             return;
@@ -306,14 +301,14 @@ class WsClient {
         const opponent = this.service.findClient(
             (this.clientId === game.userRed
                 ? game.userYellow
-                : game.userRed) as number
+                : game.userRed) as number,
         );
         if (!opponent) {
             this.socket.send(
                 this.createWsEvent("error", {
                     msg: "Opponent is not avaliable",
                     critical: true,
-                })
+                }),
             );
             this.socket.close();
             return;
@@ -334,14 +329,14 @@ class WsClient {
             this.createWsEvent("boardUpdate", {
                 board,
                 turn: "red",
-            })
+            }),
         );
 
         opponent.send(
             this.createWsEvent("boardUpdate", {
                 board,
                 turn: "red",
-            })
+            }),
         );
     }
 }

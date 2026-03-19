@@ -2,12 +2,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { WebSocketServer } from "ws";
-import router from "$/lib/modules/router";
-import WsService from "$/lib/modules/wsService";
-import configDbCleaner from "./lib/db/dbCleaner";
+import router from "./lib/modules/router.js";
+import WsService from "./lib/modules/wsService.js";
+import configDbCleaner from "./lib/db/dbCleaner.js";
 
-const port = Number(process.env.PORT) ?? 3001;
-const wsport = Number(process.env.WSPORT) ?? 3002;
+const httpport = 3010;
+const wsport = 3020;
 
 // APP
 
@@ -29,6 +29,6 @@ configDbCleaner();
 
 // Listen
 
-app.listen(port, () => {
-    console.log(`Listening on: http://localhost:${port}`);
+app.listen(httpport, () => {
+    console.log(`Listening on: http://localhost:${httpport}`);
 });

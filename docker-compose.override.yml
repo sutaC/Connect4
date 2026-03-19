@@ -1,0 +1,10 @@
+services:
+    server:
+        command: ["npx", "tsx", "watch", "/app/src/app.ts"]
+        volumes:
+            - ./server:/app
+        environment:
+            - NODE_ENV=development
+    database:
+        ports:
+            - 27017:27017

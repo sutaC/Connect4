@@ -1,0 +1,14 @@
+# Dirs
+database/data/
+node_modules/
+coverage/
+dist/
+.next/
+out/
+build/
+# Files
+*.env*
+!.env.example
+.vercel
+*.tsbuildinfo
+next-env.d.ts

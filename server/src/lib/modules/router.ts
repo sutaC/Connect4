@@ -1,7 +1,10 @@
 import { Router } from "express";
-import { createGame, findGame, findPublicGame } from "$/lib/db/db";
+import { createGame, findGame, findPublicGame } from "../db/db.js";
 
 const router = Router();
+
+// Running check
+router.get("/", (req, res) => res.sendStatus(200));
 
 router.get("/api/game/join", (req, res) => {
     return res.sendStatus(400);
