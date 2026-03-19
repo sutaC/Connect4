@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import { WebSocketServer } from "ws";
 import router from "./lib/modules/router.js";
 import WsService from "./lib/modules/wsService.js";
-import configDbCleaner from "./lib/db/dbCleaner.js";
 
 const httpport = 3010;
 const wsport = 3020;
@@ -27,10 +26,6 @@ wss.once("listening", () => {
 });
 
 const wsService = new WsService(wss);
-
-// DB
-
-configDbCleaner();
 
 // HTTP
 

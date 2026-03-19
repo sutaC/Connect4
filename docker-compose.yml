@@ -31,3 +31,14 @@ services:
             - ./database/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
         expose:
             - 27017
+    cleanup_worker:
+        build: ./server
+        command: ["node", "dist/cleanup.js"]
+        profiles:
+            - manual
+        depends_on:
+            - database
+        env_file:
+            - .env
+        volumes:
+            - /app/node_modules/
