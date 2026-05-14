@@ -85,6 +85,7 @@ export function checkGameOver(board: Player[][]): boolean {
         let countX = 0;
 
         for (let y = 0; y < board.length; y++) {
+            countX = 0;
             for (let x = 1; x < board[0].length; x++) {
                 countX =
                     board[y][x] === board[y][x - 1] && board[y][x] !== null
@@ -99,6 +100,7 @@ export function checkGameOver(board: Player[][]): boolean {
         let countY = 0;
 
         for (let x = 0; x < board[0].length; x++) {
+            countY = 0;
             for (let y = 1; y < board.length; y++) {
                 countY =
                     board[y][x] === board[y - 1][x] && board[y][x] !== null
