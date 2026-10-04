@@ -1,10 +1,7 @@
-import { MongoClient } from "mongodb";
+/*
+ * This version of Connect4 relies solely on server memory for keeping game state, rather than MongoDB.
+ */
 import { Player, getEmptyBoard } from "../modules/game.js";
-
-// --- Init ---
-if (!process.env.MONGODB_URL) throw new Error("Could not find database url");
-
-const client = new MongoClient(process.env.MONGODB_URL);
 
 // --- Types ---
 
@@ -20,66 +17,40 @@ interface Game {
     lastTimeUsed: Date;
 }
 
+// --- "Database" ---
+const db: Map<number, Game> = new Map();
+
 // --- Functions ---
 
 export async function createGame(
     gameCode: number,
     gamePublic: boolean,
 ): Promise<void> {
-    try {
-        await client.connect();
-        await client
-            .db()
-            .collection("games")
-            .insertOne({
-                gameCode,
-                gamePublic,
-                userRed: null,
-                userYellow: null,
-                board: getEmptyBoard(),
-                status: "waiting",
-                lastTimeUsed: new Date(),
-            } as Game);
-    } catch (error) {
-        console.error(error);
-    } finally {
-        await client.close();
-    }
+    const game: Game = Object.preventExtensions({
+        gameCode,
+        gamePublic,
+        userRed: null,
+        userYellow: null,
+        board: getEmptyBoard(),
+        status: "waiting",
+        lastTimeUsed: new Date(),
+    });
+    db.set(game.gameCode, game);
 }
 
 export async function findPublicGame(): Promise<number | null> {
-    try {
-        await client.connect();
-        const game = (await client
-            .db()
-            .collection("games")
-            .findOne({
-                gamePublic: true,
-                $or: [{ userRed: null }, { userYellow: null }],
-            })) as Game | null;
-
-        return game ? game.gameCode : null;
-    } catch (error) {
-        console.error(error);
-        return null;
-    } finally {
-        await client.close();
+    for (const game of db.values()) {
+        if (
+            game.gamePublic &&
+            (game.userRed === null || game.userYellow === null)
+        )
+            return game.gameCode;
     }
+    return null;
 }
 
 export async function findGame(gameCode: number): Promise<Game | null> {
-    try {
-        await client.connect();
-        const game = (await client.db().collection("games").findOne({
-            gameCode,
-        })) as Game | null;
-        return game;
-    } catch (error) {
-        console.error(error);
-        return null;
-    } finally {
-        await client.close();
-    }
+    return db.get(gameCode) ?? null;
 }
 
 export async function updateGameUsers(
@@ -87,32 +58,16 @@ export async function updateGameUsers(
     userRed: number | null,
     userYellow: number | null,
 ): Promise<void> {
-    await client.connect();
-    try {
-        if (userRed) {
-            await client.db().collection("games").updateOne(
-                { gameCode },
-                {
-                    $set: {
-                        userRed,
-                    },
-                },
-            );
-        }
-        if (userYellow) {
-            await client.db().collection("games").updateOne(
-                { gameCode },
-                {
-                    $set: {
-                        userYellow,
-                    },
-                },
-            );
-        }
-    } catch (error) {
-        console.error(error);
-    } finally {
-        await client.close();
+    const game = db.get(gameCode);
+    if (!game) {
+        console.error(`Game with code ${gameCode} not found.`);
+        return;
+    }
+    if (userRed) {
+        game.userRed = userRed;
+    }
+    if (userYellow) {
+        game.userYellow = userYellow;
     }
 }
 
@@ -120,83 +75,44 @@ export async function updateGameStatus(
     gameCode: number,
     status: GameStatus,
 ): Promise<void> {
-    await client.connect();
-    try {
-        await client.db().collection("games").updateOne(
-            { gameCode },
-            {
-                $set: {
-                    status,
-                },
-            },
-        );
-    } catch (error) {
-        console.error(error);
-    } finally {
-        await client.close();
+    const game = db.get(gameCode);
+    if (!game) {
+        console.error(`Game with code ${gameCode} not found.`);
+        return;
     }
+    game.status = status;
 }
 
 export async function updateGameBoard(
     gameCode: number,
     board: Player[][],
 ): Promise<void> {
-    await client.connect();
-    try {
-        await client.db().collection("games").updateOne(
-            { gameCode },
-            {
-                $set: {
-                    board,
-                },
-            },
-        );
-    } catch (error) {
-        console.error(error);
-    } finally {
-        await client.close();
+    const game = db.get(gameCode);
+    if (!game) {
+        console.error(`Game with code ${gameCode} not found.`);
+        return;
     }
+    game.board = board;
 }
 
 export async function deleteGame(gameCode: number): Promise<void> {
-    await client.connect();
-    try {
-        await client.db().collection("games").deleteOne({ gameCode });
-    } catch (error) {
-        console.error(error);
-    } finally {
-        await client.close();
-    }
+    db.delete(gameCode);
 }
 
 export async function deleteOldGames() {
-    await client.connect();
-    try {
-        await client
-            .db()
-            .collection("games")
-            .deleteMany({
-                lastTimeUsed: {
-                    $lte: new Date(new Date().getTime() - 1000 * 60 * 60),
-                },
-            });
-    } catch (error) {
-        console.error(error);
-    } finally {
-        await client.close();
+    const toDelete: number[] = [];
+    const treshold: Date = new Date(new Date().getTime() - 1000 * 60 * 60);
+    for (const game of db.values()) {
+        if (game.lastTimeUsed <= treshold) toDelete.push(game.gameCode);
     }
+    for (const gCode of toDelete) db.delete(gCode);
 }
 
 export async function updateGameLTU(gameCode: number) {
-    await client.connect();
-    try {
-        await client
-            .db()
-            .collection("games")
-            .updateOne({ gameCode }, { lastTimeUsed: new Date() });
-    } catch (error) {
-        console.error(error);
-    } finally {
-        await client.close();
+    const game = db.get(gameCode);
+    if (!game) {
+        console.error(`Game with code ${gameCode} not found.`);
+        return;
     }
+    game.lastTimeUsed = new Date();
 }

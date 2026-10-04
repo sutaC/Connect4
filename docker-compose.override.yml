@@ -15,6 +15,3 @@ services:
             - ./server:/app
         environment:
             - NODE_ENV=development
-    database:
-        ports:
-            - 27017:27017

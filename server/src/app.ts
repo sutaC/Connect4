@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { WebSocketServer } from "ws";
 import router from "./lib/modules/router.js";
 import WsService from "./lib/modules/wsService.js";
+import runCleanup from "./cleanup.js";
 
 const httpport = 3010;
 const wsport = 3020;
@@ -32,3 +33,6 @@ const wsService = new WsService(wss);
 app.listen(httpport, () => {
     console.log(`Listening on: http://localhost:${httpport}`);
 });
+
+// Cleanup `dbless`
+setInterval(runCleanup, 3600000); // each hour

@@ -4,13 +4,15 @@ Connect4 is a project aimed at implementing the classic game of the same name us
 
 The application is intended to enable gameplay in three modes, both locally and over the network. Additionally, the application will be adapted to function as a native app using Progressive Web App (PWA) technology.
 
+> This is the `dbless` version of server, that means the game data will be stored in-memory and not on MongoDB database!
+
 ## Used technologies
 
 - Next.js
 - Typescript
 - CSS Modules
 - Express.js
-- MongoDB
+- ~~MongoDB~~
 - Web Sockets (ws)
 - PWA
 - Docker
@@ -21,7 +23,7 @@ The application is intended to enable gameplay in three modes, both locally and 
 
 - Docker
 - Docker compose
-- Cron (optional, required for automated cleanup in production)
+- ~~Cron (optional, required for automated cleanup in production)~~
 
 ### Enviroment configuration
 
@@ -69,11 +71,13 @@ docker build -t connect4-server ./server
 docker compose up
 ```
 
-4. Cleanup worker (manual):
+4. ~~Cleanup worker (manual):~~
 
 ```bash
 ./scripts/run_cleanup.sh
 ```
+
+> Unavaliable in `dbless` mode!
 
 ### Production
 
@@ -90,13 +94,15 @@ docker build -t connect4-client ./client
 docker build -t connect4-server ./server
 ```
 
-2. Setup cron jobs:
+2. ~~Setup cron jobs:~~
 
 ```bash
 ./scripts/setup_cron.sh
 ```
 
-> Schedules the cleanup worker to run once per day via cron.
+> ~~Schedules the cleanup worker to run once per day via cron.~~
+
+> Unavaliable in `dbless` mode!
 
 3. Start the app:
 
@@ -147,28 +153,30 @@ server {
 }
 ```
 
-### Removing production systems
+### ~~Removing production systems~~
 
-To completely remove the production setup, use the provided helper scripts:
+~~To completely remove the production setup, use the provided helper scripts:~~
 
-- `remove_cron.sh`
+- ~~`remove_cron.sh`~~
 
-    > Removes the scheduled cron job responsible for running the cleanup worker.
+    > ~~Removes the scheduled cron job responsible for running the cleanup worker.~~
 
 ---
 
-**Recommended order:**
+~~**Recommended order:**~~
 
-1. Stop the running containers:
+1. ~~Stop the running containers:~~
 
 ```bash
 docker compose down
 ```
 
-2. Remove the cron job:
+2. ~~Remove the cron job:~~
 
 ```bash
 ./scripts/remove_cron.sh
 ```
 
-After these steps, the production environment will be fully removed.
+~~After these steps, the production environment will be fully removed.~~
+
+> Unavaliable in `dbless` mode!
